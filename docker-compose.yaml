@@ -1,0 +1,38 @@
+version: '3.8'
+services:
+  app:
+    build:
+      context: .
+      target: workspace
+      args:
+        ARCH: amd64
+        GO_VERSION: 1.16.5
+    image: sc-api-core:workspace
+    env_file: .env
+    # ports:
+    #   - 8080:8080
+    working_dir: /workspace
+    volumes:
+      - .:/workspace
+      - tmp:/workspace/tmp
+      - gopath:/root/go
+      - ~/.ssh:/root/.ssh
+      - ~/.aws:/root/.aws
+
+  db:
+    image: mysql:8.0.20
+    environment:
+      MYSQL_DATABASE: core
+      MYSQL_ROOT_PASSWORD: my-secret-pw
+    restart: always
+    volumes:
+      - db-data:/var/lib/mysql
+      - ./db/conf.d/my.cnf:/etc/mysql/conf.d/my.cnf
+      - ./db/sql:/docker-entrypoint-initdb.d
+    ports:
+      - 3306:3306
+
+volumes:
+  gopath:
+  tmp:
+  db-data:

@@ -1,0 +1,80 @@
+on:
+  push:
+    branches: 
+    - develop
+
+name: BuildProcess
+
+env:
+  AWS_ACCOUNT_ID: 278706633282
+  AWS_REGION: ap-northeast-1
+  AWS_ACCESS_KEY_ID: ${{ secrets.SIMPLE_COMMUNITY_DEV_AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.SIMPLE_COMMUNITY_DEV_AWS_SECRET_ACCESS_KEY }}
+  ECR_REPO_NAME: simple-community-api-core
+  BUILD_ENV: develop
+  SLACK_WEBHOOK: ${{ secrets.SIMPLE_COMMUNITY_DEV_SLACK_WEBHOOK }}
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+
+    outputs:
+      status: ${{ job.status }}
+
+    strategy:
+      matrix:
+        image: [nginx]
+        include: 
+        - image: nginx
+          target: release
+          ecr_repository: simple-community-api-core
+
+    steps:        
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ env.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+
+    - name: Login to ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+
+    - name: Build, tag, and push image to ECR
+      id: build
+      env:
+        BUILD_ENV: ${{ env.BUILD_ENV }}
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        ECR_REPOSITORY: ${{ matrix.ecr_repository }}
+      # 同じイメージタグを再度pushしないため、既にこのコミットのgit.shaのタグが付けられたイメージが存在していればスキップ
+      run: |
+        docker pull $ECR_REGISTRY/$ECR_REPOSITORY:$GITHUB_SHA && true
+        if [ "`docker image ls -q $ECR_REGISTRY/$ECR_REPOSITORY:$GITHUB_SHA`" ]; then
+          echo "Image $ECR_REGISTRY/$ECR_REPOSITORY:$GITHUB_SHA already exist."
+          echo "Skip build and push image."
+          exit 0
+        fi
+
+        DOCKER_BUILDKIT=1 docker build \
+          --target ${{ matrix.target }} \
+          --build-arg ENV=$BUILD_ENV \
+          -t $ECR_REGISTRY/$ECR_REPOSITORY:$GITHUB_SHA \
+          .
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$GITHUB_SHA
+
+    - name: Slack Notification
+      uses: rtCamp/action-slack-notify@master
+      env:
+        SLACK_WEBHOOK: ${{ env.SLACK_WEBHOOK }}
+        SLACK_TITLE: "${{ github.event.repository.name }} CICD notification [branch: ${{ github.ref }}]"
+        SLACK_USERNAME: Github Actions
+        SLACK_ICON: https://ca.slack-edge.com/T09KT0RMZ-U0176N3JVGB-a27217b6733d-192
+        SLACK_FOOTER: ""
+        MSG_MINIMAL: true
+        SLACK_MESSAGE: ${{ steps.create-message.outputs.message }}
+        SLACK_COLOR: ${{ steps.create-message.outputs.color }}
