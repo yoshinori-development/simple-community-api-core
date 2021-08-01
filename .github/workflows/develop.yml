@@ -25,10 +25,9 @@ jobs:
 
     strategy:
       matrix:
-        image: [nginx]
+        target: [release]
         include: 
-        - image: nginx
-          target: release
+        - target: release
           ecr_repository: simple-community-api-core
 
     steps:        
