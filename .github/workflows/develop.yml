@@ -67,6 +67,29 @@ jobs:
           .
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$GITHUB_SHA
 
+  slackNotification:
+    name: Slack notification
+    runs-on: ubuntu-latest
+    if: ${{ always() }}
+    needs: [build]
+
+    steps:
+    - name: Create Notification Message
+      id: create-message
+      env:
+        BUILD_STATUS: ${{ needs.build.outputs.status }}
+      run: |
+        if [ $BUILD_STATUS == success ]; then
+          message="[$GITHUB_WORKFLOW] Succeeded"
+          color=good
+        else
+          message="[$GITHUB_WORKFLOW] Failed"
+          color=danger
+        fi
+        message="${message}    $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+        echo "::set-output name=message::$message"
+        echo "::set-output name=color::$color"
+
     - name: Slack Notification
       uses: rtCamp/action-slack-notify@master
       env:
