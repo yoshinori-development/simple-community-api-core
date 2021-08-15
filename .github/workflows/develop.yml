@@ -73,6 +73,7 @@ jobs:
       with:
         repository: ${{ github.repository_owner }}/${{ env.DEPLOY_REPO_NAME }}
         ref: ${{ env.DEPLOY_REPO_REF }}
+        token: ${{ secrets.DEPLOY_PERSONAL_ACCESS_TOKEN }}
 
     - name: Fill in the new api image ID in the ECS task definition
       id: task-def-api
