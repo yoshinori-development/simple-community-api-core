@@ -9,9 +9,13 @@ env:
   AWS_REGION: ap-northeast-1
   AWS_ACCESS_KEY_ID: ${{ secrets.SIMPLE_COMMUNITY_DEV_AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.SIMPLE_COMMUNITY_DEV_AWS_SECRET_ACCESS_KEY }}
-  ECR_REPO_NAME: simple-community-api-core
   BUILD_ENV: develop
   IMAGE_TAG: develop-${{ github.sha }}
+  TASK_DEFINITION_FILE: simple-community-develop/api-core/task-definition.json
+  DEPLOY_REPO_NAME: simple-community-deploy
+  DEPLOY_REPO_REF: refs/heads/develop
+  GIT_USER_NAME: Deploy
+  GIT_USER_EMAIL: yoshinori.satoh.tokyo@gmail.com
   SLACK_WEBHOOK: ${{ secrets.SIMPLE_COMMUNITY_DEV_SLACK_WEBHOOK }}
 
 jobs:
@@ -28,6 +32,7 @@ jobs:
         include: 
         - target: release
           ecr_repository: simple-community-api-core
+          container_name: api
 
     steps:        
     - name: Checkout
@@ -67,9 +72,37 @@ jobs:
           .
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
+    # - name: Checkout
+    #   uses: actions/checkout@v2
+    #   with:
+    #     repository: ${{ github.repository_owner }}/${{ env.DEPLOY_REPO_NAME }}
+    #     ref: ${{ env.DEPLOY_REPO_REF }}
+
+    # - name: Fill in the new api image ID in the ECS task definition
+    #   id: task-def-api
+    #   uses: aws-actions/amazon-ecs-render-task-definition@v1
+    #   with:
+    #     task-definition: ${{ matrix.ecr_repository }}
+    #     container-name: ${{ matrix.container_name }}
+    #     image: ${{ steps.login-ecr.outputs.registry }}/${{ matrix.ecr_repository }}:${{ github.sha }}
+
+    # - name: git push
+    #   id: git-push
+    #   env:
+    #     UPDATED_TASK_DEFINITION: ${{ steps.task-def-api.outputs.task-definition }}
+    #   run: |
+    #     cp $UPDATED_TASK_DEFINITION $TASK_DEFINITION_FILE
+    #     cp $UPDATED_SSM_AGENT_TASK_DEFINITION $SSM_AGENT_TASK_DEFINITION_FILE
+    #     git config --local user.email $GIT_USER_EMAIL
+    #     git config --local user.name $GIT_USER_NAME
+    #     git branch
+    #     git add $TASK_DEFINITION_FILE
+    #     git commit -m "[UpdateImageTag] ${{ github.event.repository.name }} $GITHUB_SHA"
+    #     git push
+
   slackNotification:
     if: always()
-    needs: [build]
+    needs: [build, updateImageTag]
     name: workflow notification to slack
     runs-on: ubuntu-latest
     steps:
