@@ -102,7 +102,7 @@ jobs:
 
   slackNotification:
     if: always()
-    needs: [build, updateImageTag]
+    needs: [build]
     name: workflow notification to slack
     runs-on: ubuntu-latest
     steps:
