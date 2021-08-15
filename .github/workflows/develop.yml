@@ -51,26 +51,22 @@ jobs:
 
     - name: Build, tag, and push image to ECR
       id: build
-      env:
-        BUILD_ENV: ${{ env.BUILD_ENV }}
-        IMAGE_TAG: ${{ env.IMAGE_TAG }}
-        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        ECR_REPOSITORY: ${{ matrix.ecr_repository }}
       # 同じイメージタグを再度pushしないため、既にこのコミットのgit.shaのタグが付けられたイメージが存在していればスキップ
       run: |
-        docker pull $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG && true
-        if [ "`docker image ls -q $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG`" ]; then
-          echo "Image $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG already exist."
+        IMAGE_URL=${{ steps.login-ecr.outputs.registry }}/${{ matrix.ecr_repository }}:${{ env.IMAGE_TAG }}
+        docker pull $IMAGE_URL && true
+        if [ "`docker image ls -q $IMAGE_URL`" ]; then
+          echo "Image $IMAGE_URL already exist."
           echo "Skip build and push image."
           exit 0
         fi
 
         DOCKER_BUILDKIT=1 docker build \
           --target ${{ matrix.target }} \
-          --build-arg ENV=$BUILD_ENV \
-          -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG \
+          --build-arg ENV=${{ env.BUILD_ENV }} \
+          -t $IMAGE_URL \
           .
-        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        docker push $IMAGE_URL
 
     # - name: Checkout
     #   uses: actions/checkout@v2
