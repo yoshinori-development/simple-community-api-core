@@ -78,7 +78,7 @@ jobs:
       id: task-def-api
       uses: aws-actions/amazon-ecs-render-task-definition@v1
       with:
-        task-definition: ${{ matrix.ecr_repository }}
+        task-definition: ${{ env.TASK_DEFINITION_FILE }}
         container-name: ${{ matrix.container_name }}
         image: ${{ steps.login-ecr.outputs.registry }}/${{ matrix.ecr_repository }}:${{ github.sha }}
 
