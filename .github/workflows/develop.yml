@@ -68,19 +68,19 @@ jobs:
           .
         docker push $IMAGE_URL
 
-    # - name: Checkout
-    #   uses: actions/checkout@v2
-    #   with:
-    #     repository: ${{ github.repository_owner }}/${{ env.DEPLOY_REPO_NAME }}
-    #     ref: ${{ env.DEPLOY_REPO_REF }}
+    - name: Checkout
+      uses: actions/checkout@v2
+      with:
+        repository: ${{ github.repository_owner }}/${{ env.DEPLOY_REPO_NAME }}
+        ref: ${{ env.DEPLOY_REPO_REF }}
 
-    # - name: Fill in the new api image ID in the ECS task definition
-    #   id: task-def-api
-    #   uses: aws-actions/amazon-ecs-render-task-definition@v1
-    #   with:
-    #     task-definition: ${{ matrix.ecr_repository }}
-    #     container-name: ${{ matrix.container_name }}
-    #     image: ${{ steps.login-ecr.outputs.registry }}/${{ matrix.ecr_repository }}:${{ github.sha }}
+    - name: Fill in the new api image ID in the ECS task definition
+      id: task-def-api
+      uses: aws-actions/amazon-ecs-render-task-definition@v1
+      with:
+        task-definition: ${{ matrix.ecr_repository }}
+        container-name: ${{ matrix.container_name }}
+        image: ${{ steps.login-ecr.outputs.registry }}/${{ matrix.ecr_repository }}:${{ github.sha }}
 
     # - name: git push
     #   id: git-push
