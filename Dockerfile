@@ -5,7 +5,7 @@ FROM debian:buster-slim as base
 RUN apt-get -y update && \
     apt-get -y install wget
 ARG ARCH=amd64
-ARG GO_VERSION=1.16.5
+ARG GO_VERSION=1.17
 ENV GOPATH /go
 # GOROOTのデフォルトは/usr/local/go
 RUN wget https://golang.org/dl/go$GO_VERSION.linux-$ARCH.tar.gz && \
@@ -31,7 +31,7 @@ WORKDIR /workspace
 FROM base as build
 COPY . /root/app
 WORKDIR /root/app
-RUN go build -o /go/bin/app
+RUN go build -o /go/bin/app cmd/api/main.go
 
 # Release 
 FROM gcr.io/distroless/static-debian10 as release
