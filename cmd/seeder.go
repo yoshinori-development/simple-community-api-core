@@ -5,14 +5,14 @@ import (
 	"log"
 
 	"github.com/yoshinori-development/simple-community-api-core/config"
-	"github.com/yoshinori-development/simple-community-api-core/drivers/db_core"
-	"github.com/yoshinori-development/simple-community-api-core/models"
+	"github.com/yoshinori-development/simple-community-api-core/domain/model"
+	"github.com/yoshinori-development/simple-community-api-core/infrastructure/db_core"
 	"gorm.io/gorm"
 )
 
 func seeder(db *gorm.DB) error {
 	for i := 0; i < 10; i++ {
-		announcement := models.Announcement{
+		announcement := model.Announcement{
 			Title:   fmt.Sprintf("title%d", i),
 			Content: fmt.Sprintf("content%d", i),
 		}

@@ -5,8 +5,8 @@ import (
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/yoshinori-development/simple-community-api-core/config"
-	"github.com/yoshinori-development/simple-community-api-core/drivers/db_core"
-	"github.com/yoshinori-development/simple-community-api-core/router"
+	"github.com/yoshinori-development/simple-community-api-core/infrastructure/db_core"
+	"github.com/yoshinori-development/simple-community-api-core/interface/router"
 )
 
 func main() {
