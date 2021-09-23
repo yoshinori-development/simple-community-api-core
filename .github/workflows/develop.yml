@@ -74,6 +74,10 @@ jobs:
         ref: ${{ env.DEPLOY_REPO_REF }}
         token: ${{ secrets.DEPLOY_PERSONAL_ACCESS_TOKEN }}
 
+    - name: cehck
+      run: |
+        ls -l
+
     - name: Fill in the new api image ID in the ECS task definition
       id: task-def-api
       uses: aws-actions/amazon-ecs-render-task-definition@v1
