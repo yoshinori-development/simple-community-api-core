@@ -5,10 +5,10 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	"github.com/yoshinori-development/simple-community-api-core/config"
+	"github.com/yoshinori-development/simple-community-api-main/config"
 )
 
-func setupMiddlewareCors(r *gin.Engine, routerConf config.Router) {
+func setupCors(r *gin.Engine, routerConf config.Router) {
 	var allowOrigins []string
 	for _, origin := range routerConf.AllowOrigins {
 		allowOrigins = append(allowOrigins, origin)

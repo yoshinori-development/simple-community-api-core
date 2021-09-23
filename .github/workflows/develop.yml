@@ -11,7 +11,7 @@ env:
   AWS_SECRET_ACCESS_KEY: ${{ secrets.SIMPLE_COMMUNITY_DEV_AWS_SECRET_ACCESS_KEY }}
   BUILD_ENV: develop
   IMAGE_TAG: develop-${{ github.sha }}
-  TASK_DEFINITION_FILE: simple-community-develop/api-core/task-definition.json
+  TASK_DEFINITION_FILE: simple-community-develop/api-main/task-definition.json
   DEPLOY_REPO_NAME: simple-community-deploy
   DEPLOY_REPO_REF: refs/heads/develop
   GIT_USER_NAME: Deploy
@@ -31,7 +31,7 @@ jobs:
         target: [release]
         include: 
         - target: release
-          ecr_repository: simple-community-api-core
+          ecr_repositories: simple-community-api-main
           container_name: api
 
     steps:        
@@ -53,7 +53,7 @@ jobs:
       id: build
       # 同じイメージタグを再度pushしないため、既にこのコミットのgit.shaのタグが付けられたイメージが存在していればスキップ
       run: |
-        IMAGE_URL=${{ steps.login-ecr.outputs.registry }}/${{ matrix.ecr_repository }}:${{ env.IMAGE_TAG }}
+        IMAGE_URL=${{ steps.login-ecr.outputs.registry }}/${{ matrix.ecr_repositories }}:${{ env.IMAGE_TAG }}
         docker pull $IMAGE_URL && true
         if [ "`docker image ls -q $IMAGE_URL`" ]; then
           echo "Image $IMAGE_URL already exist."
@@ -71,7 +71,7 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
       with:
-        repository: ${{ github.repository_owner }}/${{ env.DEPLOY_REPO_NAME }}
+        repositories: ${{ github.repositories_owner }}/${{ env.DEPLOY_REPO_NAME }}
         ref: ${{ env.DEPLOY_REPO_REF }}
         token: ${{ secrets.DEPLOY_PERSONAL_ACCESS_TOKEN }}
 
@@ -81,7 +81,7 @@ jobs:
       with:
         task-definition: ${{ env.TASK_DEFINITION_FILE }}
         container-name: ${{ matrix.container_name }}
-        image: ${{ steps.login-ecr.outputs.registry }}/${{ matrix.ecr_repository }}:${{ github.sha }}
+        image: ${{ steps.login-ecr.outputs.registry }}/${{ matrix.ecr_repositories }}:${{ github.sha }}
 
     - name: git push
       id: git-push
@@ -91,7 +91,7 @@ jobs:
         git config --local user.name ${{ env.GIT_USER_NAME }}
         git branch
         git add ${{ env.TASK_DEFINITION_FILE }}
-        git commit -m "[UpdateImageTag] ${{ github.event.repository.name }} $GITHUB_SHA"
+        git commit -m "[UpdateImageTag] ${{ github.event.repositories.name }} $GITHUB_SHA"
         git push
 
   slackNotification:

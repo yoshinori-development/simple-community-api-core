@@ -1,4 +1,4 @@
-module github.com/yoshinori-development/simple-community-api-core
+module github.com/yoshinori-development/simple-community-api-main
 
 go 1.17
 

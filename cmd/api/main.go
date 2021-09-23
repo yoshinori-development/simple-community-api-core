@@ -3,30 +3,26 @@ package main
 import (
 	"log"
 
-	_ "github.com/go-sql-driver/mysql"
-	"github.com/yoshinori-development/simple-community-api-core/config"
-	"github.com/yoshinori-development/simple-community-api-core/infrastructure/db_core"
-	"github.com/yoshinori-development/simple-community-api-core/interface/router"
+	"github.com/yoshinori-development/simple-community-api-main/config"
+	"github.com/yoshinori-development/simple-community-api-main/repositories"
+	"github.com/yoshinori-development/simple-community-api-main/router"
 )
 
+// _ "github.com/go-sql-driver/mysql"
+
 func main() {
-	config, err := config.Get()
+	err := config.Init()
 	if err != nil {
 		log.Fatal(err.Error())
 	}
 
-	db, err := db_core.Open(config)
+	err = repositories.InitDbCore()
 	if err != nil {
 		log.Fatal(err.Error())
 	}
-	defer db_core.Close(db)
+	defer repositories.Close()
 
-	err = db_core.Migrate(db)
-	if err != nil {
-		log.Fatal(err.Error())
-	}
-
-	r, err := router.NewRouter(db, config)
+	r, err := router.Init()
 	if err != nil {
 		log.Fatal(err.Error())
 	}

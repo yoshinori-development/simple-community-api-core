@@ -8,7 +8,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
-	"github.com/yoshinori-development/simple-community-api-core/config"
+	"github.com/yoshinori-development/simple-community-api-main/config"
 )
 
 type xAmznOidc struct {
@@ -31,7 +31,7 @@ type xAmznOidcDataPayload struct {
 	Email string `header:"email"`
 }
 
-func setupMiddlewareAuthenticate(r *gin.Engine, awsConf config.Aws) {
+func setupAuthenticate(r *gin.Engine, awsConf config.Aws) {
 	r.Use(authenticate(awsConf))
 }
 

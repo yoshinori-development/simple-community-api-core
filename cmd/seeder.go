@@ -4,36 +4,36 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/yoshinori-development/simple-community-api-core/config"
-	"github.com/yoshinori-development/simple-community-api-core/domain/model"
-	"github.com/yoshinori-development/simple-community-api-core/infrastructure/db_core"
-	"gorm.io/gorm"
+	"github.com/yoshinori-development/simple-community-api-main/config"
+	"github.com/yoshinori-development/simple-community-api-main/models"
+	"github.com/yoshinori-development/simple-community-api-main/repositories"
 )
 
-func seeder(db *gorm.DB) error {
+func seeder() error {
+	announcementRepository := repositories.NewAnnouncementRepository()
 	for i := 0; i < 10; i++ {
-		announcement := model.Announcement{
-			Title:   fmt.Sprintf("title%d", i),
-			Content: fmt.Sprintf("content%d", i),
+		announcementInput := models.AnnouncementRepositoryCreateInput{
+			Announcement: models.Announcement{
+				Title:   fmt.Sprintf("title%d", i),
+				Content: fmt.Sprintf("content%d", i),
+			},
 		}
-		if err := db.Create(&announcement).Error; err != nil {
-			fmt.Printf("%+v", err)
-		}
+		announcementRepository.Create(announcementInput)
 	}
 	return nil
 }
 
 func main() {
-	config, err := config.Get()
+	err := config.Init()
 	if err != nil {
 		log.Fatal(err.Error())
 	}
 
-	db, err := db_core.Open(config)
+	err = repositories.InitDbCore()
 	if err != nil {
 		log.Fatal(err.Error())
 	}
-	defer db_core.Close(db)
+	defer repositories.Close()
 
-	seeder(db)
+	seeder()
 }

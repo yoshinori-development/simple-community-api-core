@@ -6,6 +6,8 @@ import (
 	"github.com/kelseyhightower/envconfig"
 )
 
+var config Config
+
 type Config struct {
 	Aws      Aws
 	Database Database
@@ -30,27 +32,30 @@ type Router struct {
 	AllowOrigins []string `required:"true" split_words:"true"`
 }
 
-func Get() (Config, error) {
-	var config Config
+func Init() error {
 	var err error
 
 	err = envconfig.Process("aws", &config.Aws)
 	fmt.Printf("aws config: %v", config.Aws)
 	if err != nil {
-		return config, err
+		return err
 	}
 
 	err = envconfig.Process("database", &config.Database)
 	fmt.Printf("database config: %v", config.Database)
 	if err != nil {
-		return config, err
+		return err
 	}
 
 	err = envconfig.Process("router", &config.Router)
 	fmt.Printf("router config: %v", config.Router)
 	if err != nil {
-		return config, err
+		return err
 	}
 
-	return config, nil
+	return nil
+}
+
+func Get() Config {
+	return config
 }

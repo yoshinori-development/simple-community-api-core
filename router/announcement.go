@@ -1,24 +1,24 @@
-package handlers
+package router
 
 import (
 	"net/http"
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/yoshinori-development/simple-community-api-core/usecase"
+	"github.com/yoshinori-development/simple-community-api-main/services"
 )
 
 type AnnouncementHandler struct {
-	AnnouncementUsecase usecase.AnnouncementUsecase
+	AnnouncementService services.AnnouncementService
 }
 
 type NewAnnouncementHandlerInput struct {
-	AnnouncementUsecase usecase.AnnouncementUsecase
+	AnnouncementService services.AnnouncementService
 }
 
 func NewAnnouncementHandler(input NewAnnouncementHandlerInput) *AnnouncementHandler {
 	return &AnnouncementHandler{
-		AnnouncementUsecase: input.AnnouncementUsecase,
+		AnnouncementService: input.AnnouncementService,
 	}
 }
 
@@ -30,8 +30,8 @@ type AnnouncementResponse struct {
 
 type AnnouncementListResponse []AnnouncementResponse
 
-func (handler *AnnouncementHandler) List(c *gin.Context) {
-	announcements, err := handler.AnnouncementUsecase.List()
+func (controller *AnnouncementHandler) List(c *gin.Context) {
+	announcements, err := controller.AnnouncementService.List()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 	}

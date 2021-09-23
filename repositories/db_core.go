@@ -1,27 +1,44 @@
-package db_core
+package repositories
 
 import (
 	"fmt"
 	"log"
 
 	migrate "github.com/rubenv/sql-migrate"
-	"github.com/yoshinori-development/simple-community-api-core/config"
+	"github.com/yoshinori-development/simple-community-api-main/config"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
 
-func Open(config config.Config) (*gorm.DB, error) {
-	dbConf := config.Database
-	datasource := fmt.Sprintf("%s:%s@(%s:%s)/%s?parseTime=true", dbConf.Username, dbConf.Password, dbConf.Host, dbConf.Port, dbConf.Database)
-	db, err := gorm.Open(mysql.Open(datasource), &gorm.Config{})
+var db *gorm.DB
+
+func InitDbCore() error {
+	config := config.Get()
+	err := open(config)
 	if err != nil {
-		return nil, fmt.Errorf("failed to connect database")
+		return err
 	}
 
-	return db, nil
+	err = migrateExec()
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
-func Close(db *gorm.DB) error {
+func open(config config.Config) error {
+	var err error
+	dbConf := config.Database
+	datasource := fmt.Sprintf("%s:%s@(%s:%s)/%s?parseTime=true", dbConf.Username, dbConf.Password, dbConf.Host, dbConf.Port, dbConf.Database)
+	db, err = gorm.Open(mysql.Open(datasource), &gorm.Config{})
+	if err != nil {
+		return fmt.Errorf("failed to connect database")
+	}
+
+	return nil
+}
+
+func Close() error {
 	sqlDb, err := db.DB()
 	if err != nil {
 		return err
@@ -29,7 +46,7 @@ func Close(db *gorm.DB) error {
 	return sqlDb.Close()
 }
 
-func Migrate(db *gorm.DB) error {
+func migrateExec() error {
 	sqlDb, err := db.DB()
 	if err != nil {
 		return err

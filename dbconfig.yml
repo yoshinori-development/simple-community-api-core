@@ -1,11 +1,11 @@
 local:
   dialect: mysql
-  datasource: root:my-secret-pw@(host.docker.internal:3306)/core?parseTime=true
+  datasource: root:my-secret-pw@(host.docker.internal:3306)/main?parseTime=true
   dir: migrations
   table: migrations
 
 development:
   dialect: mysql
-  datasource: root:my-secret-pw@/core?parseTime=true
+  datasource: root:my-secret-pw@/main?parseTime=true
   dir: migrations
   table: migrations

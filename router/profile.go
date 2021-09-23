@@ -1,44 +1,42 @@
-package handlers
+package router
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/yoshinori-development/simple-community-api-core/domain/model"
-	"github.com/yoshinori-development/simple-community-api-core/usecase"
+	"github.com/yoshinori-development/simple-community-api-main/models"
+	"github.com/yoshinori-development/simple-community-api-main/services"
 	"gorm.io/gorm"
 )
 
 type ProfileHandler struct {
-	ProfileUsecase usecase.ProfileUsecase
+	ProfileService services.ProfileService
 }
 
 type NewProfileHandlerInput struct {
-	ProfileUsecase usecase.ProfileUsecase
+	ProfileService services.ProfileService
 }
 
 func NewProfileHandler(input NewProfileHandlerInput) *ProfileHandler {
 	return &ProfileHandler{
-		ProfileUsecase: input.ProfileUsecase,
+		ProfileService: input.ProfileService,
 	}
 }
 
 type ProfileResponse struct {
 	Nickname  string    `json:"nickname"`
 	Age       uint      `json:"age"`
-	Birthdate string    `json:"birthdate"`
 	UpdatedAt time.Time `json:"updateAt"`
 }
 
-func (handler *ProfileHandler) Get(c *gin.Context) {
+func (controller *ProfileHandler) Get(c *gin.Context) {
 	sub, subExists := c.Get("sub")
 	if subExists {
 		c.Status(http.StatusUnauthorized)
 	}
-	profile, err := handler.ProfileUsecase.Get(usecase.ProfileUsecaseGetInput{
+	profile, err := controller.ProfileService.Get(services.ProfileServiceGetInput{
 		Sub: sub.(string),
 	})
 	if err != nil {
@@ -53,23 +51,20 @@ func (handler *ProfileHandler) Get(c *gin.Context) {
 	response := ProfileResponse{
 		Nickname:  profile.Nickname,
 		Age:       profile.Age,
-		Birthdate: profile.Birthdate,
 		UpdatedAt: profile.UpdatedAt,
 	}
 	c.JSON(http.StatusOK, response)
 }
 
-type ProfileHandlerCreateInput struct {
-	Nickname  string `form:"nickname" binding:"required,min=5"`
-	Age       uint   `form:"age" validate:"numeric"`
-	Birthdate string `form:"birthdate" validate:"string"`
+type ProfileHandlerCreateOrUpdateInput struct {
+	Nickname string `form:"nickname" binding:"required,min=5"`
+	Age      uint   `form:"age" binding:"numeric,max=150"`
 }
 
-func (handler *ProfileHandler) CreateOrUpdate(c *gin.Context) {
-	var input ProfileHandlerCreateInput
+func (controller *ProfileHandler) CreateOrUpdate(c *gin.Context) {
+	var input ProfileHandlerCreateOrUpdateInput
 	if err := c.BindJSON(&input); err != nil {
-		fmt.Println(err)
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"errors": formatValidationErrors(err)})
 		return
 	}
 
@@ -78,12 +73,11 @@ func (handler *ProfileHandler) CreateOrUpdate(c *gin.Context) {
 		c.Status(http.StatusUnauthorized)
 		return
 	}
-	err := handler.ProfileUsecase.CreateOrUpdate(usecase.ProfileUsecaseCreateOrUpdateInput{
-		Profile: model.Profile{
-			Sub:       sub.(string),
-			Nickname:  input.Nickname,
-			Age:       input.Age,
-			Birthdate: input.Birthdate,
+	err := controller.ProfileService.CreateOrUpdate(services.ProfileServiceCreateOrUpdateInput{
+		Profile: models.Profile{
+			Sub:      sub.(string),
+			Nickname: input.Nickname,
+			Age:      input.Age,
 		},
 	})
 	if err != nil {

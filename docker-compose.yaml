@@ -7,9 +7,11 @@ services:
       args:
         ARCH: amd64
         GO_VERSION: 1.17
-    image: sc-api-core:workspace
+    image: sc-api-main:workspace
     env_file: .env
     working_dir: /workspace
+    ports:
+    - 8080:8080
     volumes:
       - .:/workspace
       - tmp:/workspace/tmp
@@ -20,7 +22,7 @@ services:
   db:
     image: mysql:8.0.20
     environment:
-      MYSQL_DATABASE: core
+      MYSQL_DATABASE: main
       MYSQL_ROOT_PASSWORD: my-secret-pw
     restart: always
     volumes:
