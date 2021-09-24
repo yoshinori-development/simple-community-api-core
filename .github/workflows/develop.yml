@@ -11,7 +11,7 @@ env:
   AWS_SECRET_ACCESS_KEY: ${{ secrets.SIMPLE_COMMUNITY_DEV_AWS_SECRET_ACCESS_KEY }}
   BUILD_ENV: develop
   IMAGE_TAG: develop-${{ github.sha }}
-  TASK_DEFINITION_FILE: simple-community-develop/api-core/task-definition.json
+  TASK_DEFINITION_FILE: simple-community-develop/api-main/task-definition.json
   DEPLOY_REPO_NAME: simple-community-deploy
   DEPLOY_REPO_REF: refs/heads/develop
   GIT_USER_NAME: Deploy
@@ -72,23 +72,29 @@ jobs:
       with:
         repositories: ${{ github.repositories_owner }}/${{ env.DEPLOY_REPO_NAME }}
         ref: ${{ env.DEPLOY_REPO_REF }}
+        path: 'deploy'
         token: ${{ secrets.DEPLOY_PERSONAL_ACCESS_TOKEN }}
 
-    - name: cehck
-      run: |
-        ls -l
+    # - name: Fill in the new api image ID in the ECS task definition
+    #   id: task-def-api
+    #   uses: aws-actions/amazon-ecs-render-task-definition@v1
+    #   with:
+    #     task-definition: ${{ env.TASK_DEFINITION_FILE }}
+    #     container-name: ${{ matrix.container_name }}
+    #     image: ${{ steps.login-ecr.outputs.registry }}/${{ matrix.ecr_repositories }}:${{ github.sha }}
 
-    - name: Fill in the new api image ID in the ECS task definition
-      id: task-def-api
-      uses: aws-actions/amazon-ecs-render-task-definition@v1
-      with:
-        task-definition: ${{ env.TASK_DEFINITION_FILE }}
-        container-name: ${{ matrix.container_name }}
-        image: ${{ steps.login-ecr.outputs.registry }}/${{ matrix.ecr_repositories }}:${{ github.sha }}
+    - name: update-task-definitions
+      id: update-task-definitions
+      run: |
+        cd $GITHUB_WORKSPACE/deploy
+        image=${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ matrix.ecr_repositories }}:${{ env.IMAGE_TAG }}
+        taskdef=$(cat ${{ env.TASK_DEFINITION_FILE }} | jq 'select(.containerDefinitions[].name == "${{ matrix.container_name }}").containerDefinitions[].image |= "$image"')
+        echo $taskdef > ${{ env.TASK_DEFINITION_FILE }}
 
     - name: git push
       id: git-push
       run: |
+        cd $GITHUB_WORKSPACE/deploy
         cp ${{ steps.task-def-api.outputs.task-definition }} ${{ env.TASK_DEFINITION_FILE }}
         git config --local user.email ${{ env.GIT_USER_EMAIL }}
         git config --local user.name ${{ env.GIT_USER_NAME }}
