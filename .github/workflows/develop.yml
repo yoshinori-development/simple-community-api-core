@@ -98,7 +98,6 @@ jobs:
       id: git-push
       run: |
         cd $GITHUB_WORKSPACE/${{ env.DEPLOY_REPO_NAME }}
-        cp ${{ steps.task-def-api.outputs.task-definition }} ${{ env.TASK_DEFINITION_FILE }}
         git config --local user.email ${{ env.GIT_USER_EMAIL }}
         git config --local user.name ${{ env.GIT_USER_NAME }}
         git branch
