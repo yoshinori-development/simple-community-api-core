@@ -70,7 +70,7 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
       with:
-        repository: ${{ github.repositories_owner }}/${{ env.DEPLOY_REPO_NAME }}
+        repository: ${{ github.repository_owner }}/${{ env.DEPLOY_REPO_NAME }}
         ref: ${{ env.DEPLOY_REPO_REF }}
         path: ${{ env.DEPLOY_REPO_NAME }}
         token: ${{ secrets.DEPLOY_PERSONAL_ACCESS_TOKEN }}
