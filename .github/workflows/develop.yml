@@ -86,7 +86,9 @@ jobs:
     - name: update-task-definitions
       id: update-task-definitions
       run: |
+        pwd
         cd $GITHUB_WORKSPACE/${{ env.DEPLOY_REPO_NAME }}
+        pwd
         ls -l
         image=${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ matrix.ecr_repositories }}:${{ env.IMAGE_TAG }}
         taskdef=$(cat ${{ env.TASK_DEFINITION_FILE }} | jq 'select(.containerDefinitions[].name == "${{ matrix.container_name }}").containerDefinitions[].image |= "$image"')
