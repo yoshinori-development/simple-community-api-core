@@ -61,6 +61,8 @@ jobs:
 
         curl -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=sigstore" | jq -r '.value' > $AWS_WEB_IDENTITY_TOKEN_FILE
 
+        echo $AWS_WEB_IDENTITY_TOKEN_FILE
+
     - run: aws sts get-caller-identity
 
     - name: Login to ECR
@@ -104,10 +106,7 @@ jobs:
     - name: update-task-definitions
       id: update-task-definitions
       run: |
-        pwd
         cd $GITHUB_WORKSPACE/${{ env.DEPLOY_REPO_NAME }}
-        pwd
-        ls -l
         image=${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ matrix.ecr_repositories }}:${{ env.IMAGE_TAG }}
         taskdef=$(cat ${{ env.TASK_DEFINITION_FILE }} | jq 'select(.containerDefinitions[].name == "${{ matrix.container_name }}").containerDefinitions[].image |= "$image"')
         echo $taskdef > ${{ env.TASK_DEFINITION_FILE }}
