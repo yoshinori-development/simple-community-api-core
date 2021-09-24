@@ -72,7 +72,7 @@ jobs:
       with:
         repositories: ${{ github.repositories_owner }}/${{ env.DEPLOY_REPO_NAME }}
         ref: ${{ env.DEPLOY_REPO_REF }}
-        path: 'deploy'
+        path: ${{ env.DEPLOY_REPO_NAME }}
         token: ${{ secrets.DEPLOY_PERSONAL_ACCESS_TOKEN }}
 
     # - name: Fill in the new api image ID in the ECS task definition
@@ -86,7 +86,7 @@ jobs:
     - name: update-task-definitions
       id: update-task-definitions
       run: |
-        cd $GITHUB_WORKSPACE/deploy
+        cd $GITHUB_WORKSPACE/${{ env.DEPLOY_REPO_NAME }}
         ls -l
         image=${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ matrix.ecr_repositories }}:${{ env.IMAGE_TAG }}
         taskdef=$(cat ${{ env.TASK_DEFINITION_FILE }} | jq 'select(.containerDefinitions[].name == "${{ matrix.container_name }}").containerDefinitions[].image |= "$image"')
@@ -95,7 +95,7 @@ jobs:
     - name: git push
       id: git-push
       run: |
-        cd $GITHUB_WORKSPACE/deploy
+        cd $GITHUB_WORKSPACE/${{ env.DEPLOY_REPO_NAME }}
         cp ${{ steps.task-def-api.outputs.task-definition }} ${{ env.TASK_DEFINITION_FILE }}
         git config --local user.email ${{ env.GIT_USER_EMAIL }}
         git config --local user.name ${{ env.GIT_USER_NAME }}
