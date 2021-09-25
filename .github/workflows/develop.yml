@@ -44,7 +44,7 @@ jobs:
       run: |
         export AWS_ROLE_ARN=arn:aws:iam::858884198044:role/github_deployment_develop
         export AWS_WEB_IDENTITY_TOKEN_FILE=/tmp/awscreds
-        export AWS_DEFAULT_REGION=us-east-1
+        export AWS_DEFAULT_REGION=ap-northeast-1
 
         echo AWS_WEB_IDENTITY_TOKEN_FILE=$AWS_WEB_IDENTITY_TOKEN_FILE >> $GITHUB_ENV
         echo AWS_ROLE_ARN=$AWS_ROLE_ARN >> $GITHUB_ENV
@@ -52,7 +52,7 @@ jobs:
 
         echo $ACTIONS_ID_TOKEN_REQUEST_TOKEN
         echo $ACTIONS_ID_TOKEN_REQUEST_URL
-        echo $GITHUB_ENV
+        cat $GITHUB_ENV
 
         echo aaaaaaaaaaaaaaa
         echo $GITHUB_ENV
