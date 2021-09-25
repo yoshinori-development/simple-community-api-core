@@ -81,7 +81,7 @@ jobs:
     outputs:
       status: ${{ job.status }}
 
-   steps:        
+    steps:        
     # https://awsteele.com/blog/2021/09/15/aws-federation-comes-to-github-actions.html
     - name: Configure AWS
       run: |
