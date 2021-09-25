@@ -54,8 +54,8 @@ jobs:
       id: build
       run: |
         # ターゲットに対応するECRリポジトリ名を取得
-        if "${{ matrix.target }}" == "release"; then
-          ecr_repository=${{ env.TARGET_RELEASE_ECR_REPOSITORY }}
+        if "${{ matrix.target }}" = "release"; then
+          ecr_repository="${{ env.TARGET_RELEASE_ECR_REPOSITORY }}"
         else
           exit 1
         fi
