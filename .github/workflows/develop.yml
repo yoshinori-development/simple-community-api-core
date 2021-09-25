@@ -61,7 +61,7 @@ jobs:
         echo 1111111111111
         ls -l $AWS_WEB_IDENTITY_TOKEN_FILE
 
-    - run: aws sts get-caller-identity
+    - run: aws sts get-caller-identity --debug
 
     # - name: Configure AWS credentials
     #   uses: aws-actions/configure-aws-credentials@v1
