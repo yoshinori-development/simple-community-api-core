@@ -53,6 +53,7 @@ jobs:
     - name: Build, tag, and push image to ECR
       id: build
       run: |
+        # ターゲットに対応するECRリポジトリ名を取得
         if [ "${{ matrix.target }}" = "release" ]; then
           ecr_repository="${{ env.TARGET_RELEASE_ECR_REPOSITORY }}"
         else
@@ -60,7 +61,7 @@ jobs:
         fi
 
         # 同じイメージタグを再度pushしないため、既にこのコミットのgit.shaのタグが付けられたイメージが存在していればスキップ
-        IMAGE_URL=${{ steps.login-ecr.outputs.registry }}/${{ matrix.ecr_repository }}:${{ env.IMAGE_TAG }}
+        IMAGE_URL=${{ steps.login-ecr.outputs.registry }}/$ecr_repository:${{ env.IMAGE_TAG }}
         docker pull $IMAGE_URL && true
         if [ "`docker image ls -q $IMAGE_URL`" ]; then
           echo "Image $IMAGE_URL already exist."
