@@ -83,10 +83,11 @@ jobs:
       run: |
         for item in ${{ matrix.repo_container_map }}
         do
-          cd $GITHUB_WORKSPACE/${{ env.DEPLOY_REPO_NAME }}
-          image=${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ item.ecr_repository }}:${{ env.IMAGE_TAG }}
-          taskdef=$(cat ${{ env.TASK_DEFINITION_FILE }} | jq 'select(.containerDefinitions[].name == "${{ item.container_name }}").containerDefinitions[].image |= "$image"')
-          echo $taskdef > ${{ env.TASK_DEFINITION_FILE }}
+          echo $item
+          # cd $GITHUB_WORKSPACE/${{ env.DEPLOY_REPO_NAME }}
+          # image=${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ item.ecr_repository }}:${{ env.IMAGE_TAG }}
+          # taskdef=$(cat ${{ env.TASK_DEFINITION_FILE }} | jq 'select(.containerDefinitions[].name == "${{ item.container_name }}").containerDefinitions[].image |= "$image"')
+          # echo $taskdef > ${{ env.TASK_DEFINITION_FILE }}
         done
 
     - name: git push
