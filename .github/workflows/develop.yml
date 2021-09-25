@@ -13,7 +13,6 @@ env:
   TASK_DEFINITION_FILE: simple-community-develop/api-main/task-definition.json
   API_MAIN_ECR_REPOSITORY: simple-community-api-main
   API_MAIN_CONTAINER_NAME: api
-  DOCKER_BUILD_TARGET: release
   DEPLOY_REPO_NAME: simple-community-deploy
   DEPLOY_REPO_REF: refs/heads/develop
   GIT_USER_NAME: Deploy
@@ -29,10 +28,14 @@ jobs:
       contents: read
     outputs:
       status: ${{ job.status }}
+
+    env:
+      API_MAIN_ECR_REPOSITORY: ${{ env.API_MAIN_ECR_REPOSITORY" }} 
     strategy:
       matrix:
         include: 
-        - ecr_repository: ${{ env.API_MAIN_ECR_REPOSITORY" }}
+        - target: release
+          ecr_repository: ${{ env.API_MAIN_ECR_REPOSITORY" }}
 
     steps:        
     - name: Checkout
@@ -64,7 +67,7 @@ jobs:
         fi
 
         DOCKER_BUILDKIT=1 docker build \
-          --target ${{ env.DOCKER_BUILD_TARGET }} \
+          --target ${{ matrix.target }} \
           -t $IMAGE_URL \
           .
         docker push $IMAGE_URL
@@ -104,7 +107,7 @@ jobs:
       id: update-task-definitions
       run: |
           image=${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.API_MAIN_ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}
-          taskdef=$(cat ${{ env.TASK_DEFINITION_FILE }} | jq 'select(.containerDefinitions[].name == "${{ env.API_MAIN_ECR_REPOSITORY }}").containerDefinitions[].image |= "$image"')
+          taskdef=$(cat ${{ env.TASK_DEFINITION_FILE }} | jq 'select(.containerDefinitions[].name == "${{ env.API_MAIN_CONTAINER_NAME }}").containerDefinitions[].image |= "$image"')
           echo $taskdef > ${{ env.TASK_DEFINITION_FILE }}
 
     - name: git push
