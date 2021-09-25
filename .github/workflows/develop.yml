@@ -53,7 +53,7 @@ jobs:
     - name: Build, tag, and push image to ECR
       id: build
       run: |
-        if ["${{ matrix.target }}" = "release"]; then
+        if [ "${{ matrix.target }}" = "release" ]; then
           ecr_repository="${{ env.TARGET_RELEASE_ECR_REPOSITORY }}"
         else
           exit 1
