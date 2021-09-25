@@ -32,7 +32,7 @@ jobs:
       matrix:
         include: 
         - target: release
-          ecr_repository: ${{ $API_MAIN_ECR_REPOSITORY }}
+          ecr_repository: ${{ API_MAIN_ECR_REPOSITORY }}
 
     steps:        
     - name: Checkout
