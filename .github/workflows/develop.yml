@@ -71,7 +71,7 @@ jobs:
         docker push $IMAGE_URL
 
   updateTaskDefinitions:
-    name: Build
+    name: UpdateTaskDefinitions
     runs-on: ubuntu-latest
     permissions:
       id-token: write
