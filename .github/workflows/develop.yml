@@ -71,6 +71,13 @@ jobs:
         docker push $IMAGE_URL
 
   updateTaskDefinitions:
+    name: Build
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    outputs:
+      status: ${{ job.status }}
     strategy:
       matrix:
         containers: ["api"]
