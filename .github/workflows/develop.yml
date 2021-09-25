@@ -115,6 +115,7 @@ jobs:
         cat ${{ env.TASK_DEFINITION_FILE }} > taskdef
         echo ${{ env.TASK_DEFINITION_FILE }}
         ls -l
+        ls ${{ env.TASK_DEFINITION_FILE }}
         echo taskdef
         echo $taskdef
         echo $taskdef | jq --arg image $image 'select(.containerDefinitions[].name == "${{ env.TARGET_RELEASE_CONTAINER_NAME }}").containerDefinitions[].image |= $image' \
