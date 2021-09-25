@@ -54,6 +54,7 @@ jobs:
         echo $ACTIONS_ID_TOKEN_REQUEST_URL
         echo $GITHUB_ENV
 
+        curl -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=sigstore"
         curl -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=sigstore" | jq -r '.value' > $AWS_WEB_IDENTITY_TOKEN_FILE
         echo aaaaaaaaaaaaaaa
         cat $AWS_WEB_IDENTITY_TOKEN_FILE
