@@ -30,7 +30,7 @@ jobs:
 
     strategy:
       matrix:
-        containers: ["api"]
+        ecr_repositories: ["simple-community-api-main"]
         include: 
         - target: release
           # タスク定義中の各コンテナに対応したECRリポジトリを1対1で記述
@@ -57,7 +57,7 @@ jobs:
       id: build
       # 同じイメージタグを再度pushしないため、既にこのコミットのgit.shaのタグが付けられたイメージが存在していればスキップ
       run: |
-        IMAGE_URL=${{ steps.login-ecr.outputs.registry }}/${{ env.CONTAINER_REPO_MAP[matrix.containers] }}:${{ env.IMAGE_TAG }}
+        IMAGE_URL=${{ steps.login-ecr.outputs.registry }}/${{ matrix.ecr_repositories }}:${{ env.IMAGE_TAG }}
         docker pull $IMAGE_URL && true
         if [ "`docker image ls -q $IMAGE_URL`" ]; then
           echo "Image $IMAGE_URL already exist."
