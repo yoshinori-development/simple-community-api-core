@@ -30,7 +30,7 @@ jobs:
       status: ${{ job.status }}
     strategy:
       matrix:
-        ecr_repositories: [ "${{env.API_MAIN_ECR_REPOSITORY}}" ]
+        ecr_repositories: [ "$API_MAIN_ECR_REPOSITORY" ]
         include: 
         - target: release
 
