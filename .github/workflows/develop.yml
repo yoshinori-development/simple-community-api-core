@@ -28,14 +28,11 @@ jobs:
       contents: read
     outputs:
       status: ${{ job.status }}
-
-    env:
-      API_MAIN_ECR_REPOSITORY: ${{ env.API_MAIN_ECR_REPOSITORY" }} 
     strategy:
       matrix:
         include: 
         - target: release
-          ecr_repository: ${{ env.API_MAIN_ECR_REPOSITORY" }}
+          ecr_repository: $API_MAIN_ECR_REPOSITORY
 
     steps:        
     - name: Checkout
