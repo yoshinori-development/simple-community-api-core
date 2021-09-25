@@ -110,9 +110,9 @@ jobs:
     - name: update-task-definitions
       id: update-task-definitions
       run: |
-          image=${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.API_MAIN_ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}
-          taskdef=$(cat ${{ env.TASK_DEFINITION_FILE }} | jq 'select(.containerDefinitions[].name == "${{ env.API_MAIN_CONTAINER_NAME }}").containerDefinitions[].image |= "$image"')
-          echo $taskdef > ${{ env.TASK_DEFINITION_FILE }}
+        image=${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.TARGET_RELEASE_ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}
+        taskdef=$(cat ${{ env.TASK_DEFINITION_FILE }} | jq 'select(.containerDefinitions[].name == "${{ env.TARGET_RELEASE_CONTAINER_NAME }}").containerDefinitions[].image |= "$image"')
+        echo $taskdef > ${{ env.TASK_DEFINITION_FILE }}
 
     - name: git push
       id: git-push
