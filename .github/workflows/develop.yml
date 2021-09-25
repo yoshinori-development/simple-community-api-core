@@ -11,6 +11,7 @@ env:
   BUILD_ENV: develop
   IMAGE_TAG: develop-${{ github.sha }}
   TASK_DEFINITION_FILE: simple-community-develop/api-main/task-definition.json
+  ECR_REPO_CONTAINER_MAP: ["simple-community-api-main:api"]
   DEPLOY_REPO_NAME: simple-community-deploy
   DEPLOY_REPO_REF: refs/heads/develop
   GIT_USER_NAME: Deploy
@@ -26,14 +27,11 @@ jobs:
       contents: read
     outputs:
       status: ${{ job.status }}
-
     strategy:
       matrix:
-        ecr_repositories: ["simple-community-api-main"]
+        ecr_repo_container_map: ${{ env.ECR_REPO_CONTAINER_MAP }}
         include: 
         - target: release
-          # タスク定義中の各コンテナに対応したECRリポジトリを1対1で記述
-          # ecr_repositories: ${{ fromJSON('{\"api\": \"simple-community-api-main\"}') }}
 
     steps:        
     - name: Checkout
@@ -56,7 +54,9 @@ jobs:
       id: build
       # 同じイメージタグを再度pushしないため、既にこのコミットのgit.shaのタグが付けられたイメージが存在していればスキップ
       run: |
-        IMAGE_URL=${{ steps.login-ecr.outputs.registry }}/${{ matrix.ecr_repositories }}:${{ env.IMAGE_TAG }}
+        values=${matrix.ecr_repo_container_map//:/ }
+        ecr_repository=$values[0]
+        IMAGE_URL=${{ steps.login-ecr.outputs.registry }}/${{ ecr_repository }}:${{ env.IMAGE_TAG }}
         docker pull $IMAGE_URL && true
         if [ "`docker image ls -q $IMAGE_URL`" ]; then
           echo "Image $IMAGE_URL already exist."
@@ -81,11 +81,9 @@ jobs:
       status: ${{ job.status }}
     strategy:
       matrix:
-        containers: ["api"]
+        ecr_repo_container_map: ${{ env.ECR_REPO_CONTAINER_MAP }}
         include: 
         - target: release
-          # タスク定義中の各コンテナに対応したECRリポジトリを1対1で記述
-          ecr_repositories: ["simple-community-api-main"]
 
     steps:        
     # https://awsteele.com/blog/2021/09/15/aws-federation-comes-to-github-actions.html
@@ -111,8 +109,11 @@ jobs:
     - name: update-task-definitions
       id: update-task-definitions
       run: |
-          image=${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ matrix.ecr_repositories }}:${{ env.IMAGE_TAG }}
-          taskdef=$(cat ${{ env.TASK_DEFINITION_FILE }} | jq 'select(.containerDefinitions[].name == "${{ matrix.containers }}").containerDefinitions[].image |= "$image"')
+          values=${matrix.ecr_repo_container_map//:/ }
+          ecr_repository=$values[0]
+          container=$values[1]
+          image=${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ ecr_repository }}:${{ env.IMAGE_TAG }}
+          taskdef=$(cat ${{ env.TASK_DEFINITION_FILE }} | jq 'select(.containerDefinitions[].name == "${{ container }}").containerDefinitions[].image |= "$image"')
           echo $taskdef > ${{ env.TASK_DEFINITION_FILE }}
 
     - name: git push
