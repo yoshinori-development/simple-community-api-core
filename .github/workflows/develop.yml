@@ -111,7 +111,9 @@ jobs:
       id: update-task-definitions
       run: |
         image=${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.TARGET_RELEASE_ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}
+        echo $image
         taskdef=$(cat ${{ env.TASK_DEFINITION_FILE }} | jq 'select(.containerDefinitions[].name == "${{ env.TARGET_RELEASE_CONTAINER_NAME }}").containerDefinitions[].image |= "$image"')
+        echo $taskdef
         echo $taskdef > ${{ env.TASK_DEFINITION_FILE }}
 
     - name: git push
