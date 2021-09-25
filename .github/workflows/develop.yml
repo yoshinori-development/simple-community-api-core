@@ -112,7 +112,8 @@ jobs:
       id: update-task-definitions
       run: |
         image=${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.TARGET_RELEASE_ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}
-        taskdef=$(cat ${{ env.TASK_DEFINITION_FILE }})
+        cat ${{ env.TASK_DEFINITION_FILE }} > taskdef
+        cat ${{ env.TASK_DEFINITION_FILE }}
         ls -l
         echo taskdef
         echo $taskdef
