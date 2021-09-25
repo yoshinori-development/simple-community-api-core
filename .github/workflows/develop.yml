@@ -33,7 +33,7 @@ jobs:
         include: 
         - target: release
           # タスク定義中の各コンテナに対応したECRリポジトリを1対1で記述
-          ecr_repositories: ["simple-community-api-main"]
+          ecr_repositories: ${{ fromJSON('{\"api\": \"simple-community-api-main\"}') }}
 
     steps:        
     - name: Checkout
