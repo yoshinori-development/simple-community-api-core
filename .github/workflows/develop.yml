@@ -117,6 +117,8 @@ jobs:
         > tmp \
         && mv tmp ${{ env.TASK_DEFINITION_FILE }}
 
+        cat ${{ env.TASK_DEFINITION_FILE }}
+
     - name: git push
       id: git-push
       run: |
