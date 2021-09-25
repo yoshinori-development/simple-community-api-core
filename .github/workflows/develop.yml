@@ -29,11 +29,11 @@ jobs:
 
     strategy:
       matrix:
-        target: [release]
+        containers: ["api"]
         include: 
         - target: release
           # タスク定義中の各コンテナに対応したECRリポジトリを1対1で記述
-          repo_container_map: [{"ecr_repo":"simple-community-api-main", "container_name": "api"}]
+          ecr_repositories: ["simple-community-api-main"]
 
     steps:        
     - name: Checkout
@@ -70,27 +70,46 @@ jobs:
           .
         docker push $IMAGE_URL
 
+  updateTaskDefinitions:
+    strategy:
+      matrix:
+        containers: ["api"]
+        include: 
+        - target: release
+          # タスク定義中の各コンテナに対応したECRリポジトリを1対1で記述
+          ecr_repositories: ["simple-community-api-main"]
+
+    steps:        
+    # https://awsteele.com/blog/2021/09/15/aws-federation-comes-to-github-actions.html
+    - name: Configure AWS
+      run: |
+        export AWS_WEB_IDENTITY_TOKEN_FILE=/tmp/awscreds
+        echo AWS_WEB_IDENTITY_TOKEN_FILE=$AWS_WEB_IDENTITY_TOKEN_FILE >> $GITHUB_ENV
+        echo AWS_ROLE_ARN=${{ env.AWS_ROLE_ARN }} >> $GITHUB_ENV
+        echo AWS_DEFAULT_REGION=${{ env.AWS_REGION }} >> $GITHUB_ENV
+        curl -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "$ACTIONS_ID_TOKEN_REQUEST_URL" | jq -r '.value' > $AWS_WEB_IDENTITY_TOKEN_FILE
+
+    - name: Login to ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+
     - name: Checkout
       uses: actions/checkout@v2
       with:
         repository: ${{ github.repository_owner }}/${{ env.DEPLOY_REPO_NAME }}
         ref: ${{ env.DEPLOY_REPO_REF }}
-        path: ${{ env.DEPLOY_REPO_NAME }}
         token: ${{ secrets.DEPLOY_PERSONAL_ACCESS_TOKEN }}
 
     - name: update-task-definitions
       id: update-task-definitions
       run: |
-        for item in ${{ matrix.repo_container_map }}
-        do
-          echo $item
-
-        done
+          image=${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ matrix.ecr_repositories }}:${{ env.IMAGE_TAG }}
+          taskdef=$(cat ${{ env.TASK_DEFINITION_FILE }} | jq 'select(.containerDefinitions[].name == "${{ matrix.containers }}").containerDefinitions[].image |= "$image"')
+          echo $taskdef > ${{ env.TASK_DEFINITION_FILE }}
 
     - name: git push
       id: git-push
       run: |
-        cd $GITHUB_WORKSPACE/${{ env.DEPLOY_REPO_NAME }}
         git config --local user.email ${{ env.GIT_USER_EMAIL }}
         git config --local user.name ${{ env.GIT_USER_NAME }}
         git branch
