@@ -38,18 +38,21 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
 
-    # https://awsteele.com/blog/2021/09/15/aws-federation-comes-to-github-actions.html
-    - name: Configure AWS
-      run: |
-        export AWS_WEB_IDENTITY_TOKEN_FILE=/tmp/awscreds
-        echo AWS_WEB_IDENTITY_TOKEN_FILE=$AWS_WEB_IDENTITY_TOKEN_FILE >> $GITHUB_ENV
-        echo AWS_ROLE_ARN=${{ env.AWS_ROLE_ARN }} >> $GITHUB_ENV
-        echo AWS_DEFAULT_REGION=${{ env.AWS_REGION }} >> $GITHUB_ENV
-        curl -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "$ACTIONS_ID_TOKEN_REQUEST_URL" | jq -r '.value' > $AWS_WEB_IDENTITY_TOKEN_FILE
+    - name: Setup AWS Credentials
+      uses: yoshinori-development/simple-community-actions@v1
 
-    - name: Login to ECR
-      id: login-ecr
-      uses: aws-actions/amazon-ecr-login@v1
+    # # https://awsteele.com/blog/2021/09/15/aws-federation-comes-to-github-actions.html
+    # - name: Configure AWS
+    #   run: |
+    #     export AWS_WEB_IDENTITY_TOKEN_FILE=/tmp/awscreds
+    #     echo AWS_WEB_IDENTITY_TOKEN_FILE=$AWS_WEB_IDENTITY_TOKEN_FILE >> $GITHUB_ENV
+    #     echo AWS_ROLE_ARN=${{ env.AWS_ROLE_ARN }} >> $GITHUB_ENV
+    #     echo AWS_DEFAULT_REGION=${{ env.AWS_REGION }} >> $GITHUB_ENV
+    #     curl -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "$ACTIONS_ID_TOKEN_REQUEST_URL" | jq -r '.value' > $AWS_WEB_IDENTITY_TOKEN_FILE
+
+    # - name: Login to ECR
+    #   id: login-ecr
+    #   uses: aws-actions/amazon-ecr-login@v1
 
     - name: Build, tag, and push image to ECR
       id: build
@@ -111,6 +114,7 @@ jobs:
     - name: update-task-definitions
       id: update-task-definitions
       run: |
+        # ビルドターゲットが増えたらここを改修
         image=${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.TARGET_RELEASE_ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}
         cat ${{ env.TASK_DEFINITION_FILE }} \
         | jq --arg image $image 'select(.containerDefinitions[].name == "${{ env.TARGET_RELEASE_CONTAINER_NAME }}").containerDefinitions[].image |= $image' \
