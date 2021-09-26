@@ -40,6 +40,9 @@ jobs:
 
     - name: Setup AWS Credentials
       uses: yoshinori-development/simple-community-actions@master
+      with: 
+        aws_role_arn: ${{ env.AWS_ROLE_ARN }}
+        aws_region: ${{ env.AWS_REGION }}
 
     # # https://awsteele.com/blog/2021/09/15/aws-federation-comes-to-github-actions.html
     # - name: Configure AWS
