@@ -38,20 +38,11 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
 
-    - name: Setup AWS Credentials
-      uses: yoshinori-development/simple-community-actions@master
+    - name: Configure AWS Credentials
+      uses: yoshinori-development/simple-community-actions-aws-creds@v1
       with: 
         aws_role_arn: ${{ env.AWS_ROLE_ARN }}
         aws_region: ${{ env.AWS_REGION }}
-
-    # # https://awsteele.com/blog/2021/09/15/aws-federation-comes-to-github-actions.html
-    # - name: Configure AWS
-    #   run: |
-    #     export AWS_WEB_IDENTITY_TOKEN_FILE=/tmp/awscreds
-    #     echo AWS_WEB_IDENTITY_TOKEN_FILE=$AWS_WEB_IDENTITY_TOKEN_FILE >> $GITHUB_ENV
-    #     echo AWS_ROLE_ARN=${{ env.AWS_ROLE_ARN }} >> $GITHUB_ENV
-    #     echo AWS_DEFAULT_REGION=${{ env.AWS_REGION }} >> $GITHUB_ENV
-    #     curl -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "$ACTIONS_ID_TOKEN_REQUEST_URL" | jq -r '.value' > $AWS_WEB_IDENTITY_TOKEN_FILE
 
     - name: Login to ECR
       id: login-ecr
@@ -94,14 +85,11 @@ jobs:
       status: ${{ job.status }}
 
     steps:        
-    # https://awsteele.com/blog/2021/09/15/aws-federation-comes-to-github-actions.html
-    - name: Configure AWS
-      run: |
-        export AWS_WEB_IDENTITY_TOKEN_FILE=/tmp/awscreds
-        echo AWS_WEB_IDENTITY_TOKEN_FILE=$AWS_WEB_IDENTITY_TOKEN_FILE >> $GITHUB_ENV
-        echo AWS_ROLE_ARN=${{ env.AWS_ROLE_ARN }} >> $GITHUB_ENV
-        echo AWS_DEFAULT_REGION=${{ env.AWS_REGION }} >> $GITHUB_ENV
-        curl -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "$ACTIONS_ID_TOKEN_REQUEST_URL" | jq -r '.value' > $AWS_WEB_IDENTITY_TOKEN_FILE
+    - name: Configure AWS Credentials
+      uses: yoshinori-development/simple-community-actions-aws-creds@v1
+      with: 
+        aws_role_arn: ${{ env.AWS_ROLE_ARN }}
+        aws_region: ${{ env.AWS_REGION }}
 
     - name: Login to ECR
       id: login-ecr
@@ -127,7 +115,6 @@ jobs:
     - name: git push
       id: git-push
       run: |
-        cat ${{ env.TASK_DEFINITION_FILE }}
         git config --local user.email ${{ env.GIT_USER_EMAIL }}
         git config --local user.name ${{ env.GIT_USER_NAME }}
         git branch
