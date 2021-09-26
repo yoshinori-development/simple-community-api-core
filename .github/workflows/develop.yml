@@ -3,7 +3,7 @@ on:
     branches: 
     - develop
 
-name: BuildProcess
+name: develop
 
 env:
   AWS_ACCOUNT_ID: 858884198044
@@ -34,7 +34,6 @@ jobs:
         include: 
         - target: release
           ecr_repository: simple-community-api-main
-
     steps:        
     - name: Docker build
       uses: yoshinori-development/simple-community-actions-build@master
@@ -45,38 +44,6 @@ jobs:
         image_tag: ${{ env.IMAGE_TAG }}
         build_target: ${{ matrix.target }}
 
-    # - name: Checkout
-    #   uses: actions/checkout@v2
-
-    # - name: Configure AWS Credentials
-    #   uses: yoshinori-development/simple-community-actions-aws-creds@v1
-    #   with: 
-    #     aws_role_arn: ${{ env.AWS_ROLE_ARN }}
-    #     aws_region: ${{ env.AWS_REGION }}
-
-    # - name: Login to ECR
-    #   id: login-ecr
-    #   uses: aws-actions/amazon-ecr-login@v1
-
-    # - name: Build, tag, and push image to ECR
-    #   id: build
-    #   run: |
-    #     # 同じイメージタグを再度pushしないため、既にこのコミットのgit.shaのタグが付けられたイメージが存在していればスキップ
-    #     IMAGE_URL=${{ steps.login-ecr.outputs.registry }}/${{ matrix.ecr_repository }}:${{ env.IMAGE_TAG }}
-    #     docker pull $IMAGE_URL && true
-    #     if [ "`docker image ls -q $IMAGE_URL`" ]; then
-    #       echo "Image $IMAGE_URL already exist."
-    #       echo "Skip build and push image."
-    #       exit 0
-    #     fi
-
-    #     # ビルド & プッシュ
-    #     DOCKER_BUILDKIT=1 docker build \
-    #       --target ${{ matrix.target }} \
-    #       -t $IMAGE_URL \
-    #       .
-    #     docker push $IMAGE_URL
-
   updateTaskDefinitions:
     name: UpdateTaskDefinitions
     needs: [build]
@@ -86,13 +53,12 @@ jobs:
       contents: read
     outputs:
       status: ${{ job.status }}
-
     steps:        
     - name: Configure AWS Credentials
       uses: yoshinori-development/simple-community-actions-aws-creds@v1
       with: 
-        aws_role_arn: ${{ env.AWS_ROLE_ARN }}
-        aws_region: ${{ env.AWS_REGION }}
+        aws_role_arn: ${{ inputs.aws_role_arn }}
+        aws_region: ${{ inputs.aws_region }}
 
     - name: Login to ECR
       id: login-ecr
@@ -101,9 +67,9 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
       with:
-        repository: ${{ github.repository_owner }}/${{ env.DEPLOY_REPO_NAME }}
-        ref: ${{ env.DEPLOY_REPO_REF }}
-        token: ${{ secrets.DEPLOY_PERSONAL_ACCESS_TOKEN }}
+        repository: ${{ github.repository_owner }}/${{ inputs.deploy_repo_name }}
+        ref: ${{ inputs.deploy_repo_ref }}
+        token: ${{ inputs.token }}
 
     - name: update-task-definitions
       id: update-task-definitions
@@ -118,10 +84,10 @@ jobs:
     - name: git push
       id: git-push
       run: |
-        git config --local user.email ${{ env.GIT_USER_EMAIL }}
-        git config --local user.name ${{ env.GIT_USER_NAME }}
+        git config --local user.email ${{ inputs.git_user_email }}
+        git config --local user.name ${{ inputs.git_user_name }}
         git branch
-        git add ${{ env.TASK_DEFINITION_FILE }}
+        git add ${{ inputs.task_definition_file }}
         git commit -m "[UpdateImageTag] ${{ github.event.repositories.name }} $GITHUB_SHA"
         git push
 
