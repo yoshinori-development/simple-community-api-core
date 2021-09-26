@@ -3,7 +3,7 @@ on:
     branches: 
     - develop
 
-name: develop
+name: BuildProcess
 
 env:
   AWS_ACCOUNT_ID: 858884198044
@@ -68,6 +68,43 @@ jobs:
         token: ${{ secrets.DEPLOY_PERSONAL_ACCESS_TOKEN }}
         task_definition_file: ${{ env.TASK_DEFINITION_FILE }} 
         targets: '[{ "container": "api", "ecr_repository": "simple-community-api-main" }]'
+
+    # - name: Configure AWS Credentials
+    #   uses: yoshinori-development/simple-community-actions-aws-creds@v1
+    #   with: 
+    #     aws_role_arn: ${{ env.AWS_ROLE_ARN }}
+    #     aws_region: ${{ env.AWS_REGION }}
+
+    # - name: Login to ECR
+    #   id: login-ecr
+    #   uses: aws-actions/amazon-ecr-login@v1
+
+    # - name: Checkout
+    #   uses: actions/checkout@v2
+    #   with:
+    #     repository: ${{ github.repository_owner }}/${{ env.DEPLOY_REPO_NAME }}
+    #     ref: ${{ env.DEPLOY_REPO_REF }}
+    #     token: ${{ secrets.DEPLOY_PERSONAL_ACCESS_TOKEN }}
+
+    # - name: update-task-definitions
+    #   id: update-task-definitions
+    #   run: |
+    #     # ビルドターゲットが増えたらここを改修
+    #     image=${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.TARGET_RELEASE_ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}
+    #     cat ${{ env.TASK_DEFINITION_FILE }} \
+    #     | jq --arg image $image 'select(.containerDefinitions[].name == "${{ env.TARGET_RELEASE_CONTAINER_NAME }}").containerDefinitions[].image |= $image' \
+    #     > tmp
+    #     mv tmp ${{ env.TASK_DEFINITION_FILE }}
+
+    # - name: git push
+    #   id: git-push
+    #   run: |
+    #     git config --local user.email ${{ env.GIT_USER_EMAIL }}
+    #     git config --local user.name ${{ env.GIT_USER_NAME }}
+    #     git branch
+    #     git add ${{ env.TASK_DEFINITION_FILE }}
+    #     git commit -m "[UpdateImageTag] ${{ github.event.repositories.name }} $GITHUB_SHA"
+    #     git push
 
   slackNotification:
     if: always()
