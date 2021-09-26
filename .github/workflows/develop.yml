@@ -57,8 +57,8 @@ jobs:
     - name: Configure AWS Credentials
       uses: yoshinori-development/simple-community-actions-aws-creds@v1
       with: 
-        aws_role_arn: ${{ inputs.aws_role_arn }}
-        aws_region: ${{ inputs.aws_region }}
+        aws_role_arn: ${{ env.AWS_ROLE_ARN }}
+        aws_region: ${{ env.AWS_REGION }}
 
     - name: Login to ECR
       id: login-ecr
@@ -67,9 +67,9 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
       with:
-        repository: ${{ github.repository_owner }}/${{ inputs.deploy_repo_name }}
-        ref: ${{ inputs.deploy_repo_ref }}
-        token: ${{ inputs.token }}
+        repository: ${{ github.repository_owner }}/${{ env.DEPLOY_REPO_NAME }}
+        ref: ${{ env.DEPLOY_REPO_REF }}
+        token: ${{ secrets.DEPLOY_PERSONAL_ACCESS_TOKEN }}
 
     - name: update-task-definitions
       id: update-task-definitions
@@ -84,8 +84,8 @@ jobs:
     - name: git push
       id: git-push
       run: |
-        git config --local user.email ${{ inputs.git_user_email }}
-        git config --local user.name ${{ inputs.git_user_name }}
+        git config --local user.email ${{ env.GIT_USER_EMAIL }}
+        git config --local user.name ${{ env.GIT_USER_NAME }}
         git branch
         git add ${{ inputs.task_definition_file }}
         git commit -m "[UpdateImageTag] ${{ github.event.repositories.name }} $GITHUB_SHA"
