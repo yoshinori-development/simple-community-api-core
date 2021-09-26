@@ -64,7 +64,8 @@ jobs:
         deploy_repo_name: ${{ env.DEPLOY_REPO_NAME }}
         deploy_repo_ref: ${{ env.DEPLOY_REPO_REF }}
         task_definition_file: ${{ env.TASK_DEFINITION_FILE }} 
-        targets: '[{ "container": "api", "ecr_repository": "simple-community-api-main" }]'
+        containers: ["api"]
+        ecr_repositories: ["simple-community-api-main"]
 
     # - name: Configure AWS Credentials
     #   uses: yoshinori-development/simple-community-actions-aws-creds@v1
