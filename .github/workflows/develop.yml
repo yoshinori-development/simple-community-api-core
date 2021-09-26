@@ -57,12 +57,14 @@ jobs:
     - name: Update Task Definitions
       uses: yoshinori-development/simple-community-actions-build@master
       with: 
-        aws_account_id: ${{ env.AWS_ACCOUNT_ID }}
         aws_role_arn: ${{ env.AWS_ROLE_ARN }}
         aws_region: ${{ env.AWS_REGION }}
         image_tag: ${{ env.IMAGE_TAG }}
         deploy_repo_name: ${{ env.DEPLOY_REPO_NAME }}
         deploy_repo_ref: ${{ env.DEPLOY_REPO_REF }}
+        aws_account_id: ${{ env.AWS_ACCOUNT_ID }}
+        aws_region: ${{ env.AWS_REGION }}
+        image_tag: ${{ env.IMAGE_TAG }}
         task_definition_file: ${{ env.TASK_DEFINITION_FILE }} 
         containers: ["api"]
         ecr_repositories: ["simple-community-api-main"]
