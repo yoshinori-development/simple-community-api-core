@@ -6,14 +6,11 @@ on:
 name: develop
 
 env:
-  AWS_ACCOUNT_ID: 858884198044
   AWS_REGION: ap-northeast-1
   AWS_ROLE_ARN: arn:aws:iam::858884198044:role/github_deployment_develop
   BUILD_ENV: develop
   IMAGE_TAG: develop-${{ github.sha }}
   TASK_DEFINITION_FILE: simple-community-develop/api-main/task-definition.json
-  TARGET_RELEASE_ECR_REPOSITORY: simple-community-api-main
-  TARGET_RELEASE_CONTAINER_NAME: api
   DEPLOY_REPO_NAME: simple-community-deploy
   DEPLOY_REPO_REF: refs/heads/develop
   GIT_USER_NAME: Deploy
@@ -30,7 +27,7 @@ jobs:
     outputs:
       status: ${{ job.status }}
     strategy:
-      matrix:
+      matrix: # ビルドターゲットが増えたらmatrixを追従する
         include: 
         - target: release
           ecr_repository: simple-community-api-main
@@ -71,11 +68,15 @@ jobs:
         ref: ${{ env.DEPLOY_REPO_REF }}
         token: ${{ secrets.DEPLOY_PERSONAL_ACCESS_TOKEN }}
 
+    # ビルドターゲットが増えたらここのタスク定義書き換えを追従する
     - name: update-task-definitions
       id: update-task-definitions
+      env: 
+        TARGET_RELEASE_ECR_REPOSITORY: simple-community-api-main
+        TARGET_RELEASE_CONTAINER_NAME: api
       run: |
-        # ビルドターゲットが増えたらここを改修
-        image=${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.TARGET_RELEASE_ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}
+        # [Target]: release
+        image=${{ steps.login-ecr.outputs.registry }}/${{ env.TARGET_RELEASE_ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}
         cat ${{ env.TASK_DEFINITION_FILE }} \
         | jq --arg image $image 'select(.containerDefinitions[].name == "${{ env.TARGET_RELEASE_CONTAINER_NAME }}").containerDefinitions[].image |= $image' \
         > tmp
