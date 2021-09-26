@@ -63,6 +63,7 @@ jobs:
         image_tag: ${{ env.IMAGE_TAG }}
         deploy_repo_name: ${{ env.DEPLOY_REPO_NAME }}
         deploy_repo_ref: ${{ env.DEPLOY_REPO_REF }}
+        token: ${{ secrets.DEPLOY_PERSONAL_ACCESS_TOKEN }}
         task_definition_file: ${{ env.TASK_DEFINITION_FILE }} 
         targets: '[{ "container": "api", "ecr_repository": "simple-community-api-main" }]'
 
