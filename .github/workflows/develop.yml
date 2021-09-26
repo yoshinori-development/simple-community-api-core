@@ -60,6 +60,8 @@ jobs:
         aws_account_id: ${{ env.AWS_ACCOUNT_ID }}
         aws_role_arn: ${{ env.AWS_ROLE_ARN }}
         aws_region: ${{ env.AWS_REGION }}
+        git_user_email:  ${{ env.GIT_USER_EMAIL }}
+        git_user_name:  ${{ env.GIT_USER_NAME }}
         image_tag: ${{ env.IMAGE_TAG }}
         deploy_repo_name: ${{ env.DEPLOY_REPO_NAME }}
         deploy_repo_ref: ${{ env.DEPLOY_REPO_REF }}
