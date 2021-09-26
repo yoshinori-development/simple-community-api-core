@@ -87,7 +87,7 @@ jobs:
         git config --local user.email ${{ env.GIT_USER_EMAIL }}
         git config --local user.name ${{ env.GIT_USER_NAME }}
         git branch
-        git add ${{ inputs.task_definition_file }}
+        git add ${{ env.TASK_DEFINITION_FILE }}
         git commit -m "[UpdateImageTag] ${{ github.event.repositories.name }} $GITHUB_SHA"
         git push
 
