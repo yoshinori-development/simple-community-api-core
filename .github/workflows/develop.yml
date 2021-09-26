@@ -40,7 +40,6 @@ jobs:
 
     - name: Setup AWS Credentials
       uses: yoshinori-development/simple-community-actions@master
-      shell: bash
       with: 
         aws_role_arn: ${{ env.AWS_ROLE_ARN }}
         aws_region: ${{ env.AWS_REGION }}
