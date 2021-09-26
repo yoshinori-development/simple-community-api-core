@@ -39,7 +39,7 @@ jobs:
       uses: actions/checkout@v2
 
     - name: Setup AWS Credentials
-      uses: yoshinori-development/simple-community-actions@v1
+      uses: yoshinori-development/simple-community-actions@master
 
     # # https://awsteele.com/blog/2021/09/15/aws-federation-comes-to-github-actions.html
     # - name: Configure AWS
