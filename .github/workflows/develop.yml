@@ -55,7 +55,7 @@ jobs:
 
     steps:        
     - name: Update Task Definitions
-      uses: yoshinori-development/simple-community-actions-build@master
+      uses: yoshinori-development/simple-community-actions-update-taskdef@master
       with: 
         aws_account_id: ${{ env.AWS_ACCOUNT_ID }}
         aws_role_arn: ${{ env.AWS_ROLE_ARN }}
