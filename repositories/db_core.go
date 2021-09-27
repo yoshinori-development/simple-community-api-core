@@ -29,7 +29,7 @@ func InitDbCore() error {
 func open(config config.Config) error {
 	var err error
 	dbConf := config.Database
-	datasource := fmt.Sprintf("%s:%s@(%s:%s)/%s?parseTime=true", dbConf.Username, dbConf.Password, dbConf.Host, dbConf.Port, dbConf.Database)
+	datasource := fmt.Sprintf("%s:%s@(%s:%s)/%s?parseTime=true", dbConf.Username, dbConf.Password, dbConf.Host, dbConf.Port, dbConf.Name)
 	db, err = gorm.Open(mysql.Open(datasource), &gorm.Config{})
 	if err != nil {
 		return fmt.Errorf("failed to connect database")
