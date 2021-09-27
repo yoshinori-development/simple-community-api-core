@@ -34,7 +34,7 @@ WORKDIR /root/app
 RUN go build -o /go/bin/app cmd/api/main.go
 
 # Release 
-FROM gcr.io/distroless/static-debian10 as release
+FROM gcr.io/distroless/base-debian10 as release
 COPY --from=build /go/bin/app /
 CMD ["/app"]
 EXPOSE 8080
