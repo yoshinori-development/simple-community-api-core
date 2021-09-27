@@ -23,7 +23,7 @@ type Database struct {
 	Password      string `required:"true"`
 	Host          string `required:"true"`
 	Port          string `required:"true"`
-	Database      string `required:"true"`
+	Name          string `required:"true"`
 	AutoMigration bool   `default:"false" split_words:"true"`
 }
 
