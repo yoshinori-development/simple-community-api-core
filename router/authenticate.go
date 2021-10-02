@@ -43,7 +43,8 @@ func authenticate(awsConf config.Aws) gin.HandlerFunc {
 			log.Print(err)
 		}
 
-		log.Printf("%v", c.Request.Header)
+		fmt.Println("111111111111")
+		log.Printf("%v", c.GetHeader())
 
 		log.Print(h)
 		if h.Data != "" {

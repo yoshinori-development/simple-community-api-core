@@ -1,7 +1,9 @@
 package router
 
 import (
+	"fmt"
 	"net/http"
+	"net/http/httputil"
 	"reflect"
 	"strings"
 
@@ -21,7 +23,6 @@ func Init() (*gin.Engine, error) {
 	awsConf := config.Aws
 
 	r := gin.Default()
-	root := r.Group("/api")
 	setupCors(r, routerConf)
 	setupAuthenticate(r, awsConf)
 
@@ -36,6 +37,8 @@ func Init() (*gin.Engine, error) {
 		})
 	}
 
+	root := r.Group("/api")
+	root.Use(RequestLogger())
 	root.GET("/health", func(c *gin.Context) {
 		c.Status(http.StatusOK)
 	})
@@ -66,4 +69,19 @@ func Init() (*gin.Engine, error) {
 	}
 
 	return r, nil
+}
+
+func RequestLogger() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		fmt.Println(c.Request.Host, c.Request.RemoteAddr, c.Request.RequestURI)
+
+		// Save a copy of this request for debugging.
+		requestDump, err := httputil.DumpRequest(c.Request, true)
+		if err != nil {
+			fmt.Println(err)
+		}
+		fmt.Println(string(requestDump))
+
+		c.Next()
+	}
 }
