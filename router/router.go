@@ -58,7 +58,7 @@ func Init() (*gin.Engine, error) {
 	profileHandler := NewProfileHandler(NewProfileHandlerInput{
 		ProfileService: profileService,
 	})
-	profile := r.Group("/profile")
+	profile := root.Group("/profile")
 	profile.Use(mustAuthenticated())
 	{
 		profile.GET("", profileHandler.Get)
