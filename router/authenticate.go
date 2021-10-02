@@ -61,6 +61,8 @@ func authenticate(awsConf config.Aws) gin.HandlerFunc {
 				return publicKey, nil
 			})
 
+			fmt.Println(token)
+			fmt.Println(token.Claims)
 			if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 				fmt.Println("AAAAAAAAAAAa")
 				c.Set("sub", claims["sub"])
