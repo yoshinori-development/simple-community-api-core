@@ -44,7 +44,6 @@ func authenticate(awsConf config.Aws) gin.HandlerFunc {
 		}
 
 		fmt.Println("111111111111")
-		log.Printf("%v", c.GetHeader())
 
 		log.Print(h)
 		if h.Data != "" {
