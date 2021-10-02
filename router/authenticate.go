@@ -47,13 +47,17 @@ func authenticate(awsConf config.Aws) gin.HandlerFunc {
 
 		log.Print(h)
 		if h.Data != "" {
+			fmt.Println(h.Data)
 			token, err := jwt.Parse(h.Data, func(token *jwt.Token) (interface{}, error) {
+				fmt.Println(token)
 				if _, ok := token.Method.(*jwt.SigningMethodRSA); !ok {
 					log.Printf("Unexpected signing method: %v", token.Header["alg"])
 					c.Status(http.StatusUnauthorized)
 				}
 				url := fmt.Sprintf("https://public-keys.auth.elb.%s.amazonaws.com/%s", awsConf.DefaultRegion, token.Header["kid"])
+				fmt.Println(url)
 				publicKey, err := ioutil.ReadFile(url)
+				fmt.Println(publicKey)
 				if err != nil {
 					log.Print(err)
 					c.Status(http.StatusUnauthorized)
@@ -61,6 +65,7 @@ func authenticate(awsConf config.Aws) gin.HandlerFunc {
 				return publicKey, nil
 			})
 
+			fmt.Println("222222222222")
 			fmt.Println(token)
 			fmt.Println(token.Claims)
 			if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
