@@ -43,6 +43,7 @@ func authenticate(awsConf config.Aws) gin.HandlerFunc {
 			log.Print(err)
 		}
 
+		log.Print(h)
 		if h.Data != "" {
 			token, err := jwt.Parse(h.Data, func(token *jwt.Token) (interface{}, error) {
 				if _, ok := token.Method.(*jwt.SigningMethodRSA); !ok {
@@ -59,8 +60,10 @@ func authenticate(awsConf config.Aws) gin.HandlerFunc {
 			})
 
 			if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+				fmt.Println("AAAAAAAAAAAa")
 				c.Set("sub", claims["sub"])
 			} else {
+				fmt.Println("BBBBBBBBB")
 				fmt.Println(err)
 			}
 		}
@@ -71,7 +74,8 @@ func authenticate(awsConf config.Aws) gin.HandlerFunc {
 
 func mustAuthenticated() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if _, exists := c.Get("sub"); !exists {
+		if sub, exists := c.Get("sub"); !exists {
+			fmt.Println(sub)
 			c.JSON(http.StatusUnauthorized, RenderMessageError(errors.New("not authenticated"), "ログインが必要です"))
 			c.Abort()
 		}
