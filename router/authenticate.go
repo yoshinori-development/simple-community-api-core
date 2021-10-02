@@ -69,6 +69,10 @@ func authenticate(awsConf config.Aws) gin.HandlerFunc {
 				return publicKey, nil
 			})
 
+			if err != nil {
+				fmt.Println(err)
+			}
+
 			fmt.Println("222222222222")
 			fmt.Println(token)
 			fmt.Println(token.Claims)
