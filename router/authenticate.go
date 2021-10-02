@@ -48,10 +48,10 @@ func authenticate(awsConf config.Aws) gin.HandlerFunc {
 		log.Print(h)
 		if h.Data != "" {
 			fmt.Println(h.Data)
-			token, err := jwt.Parse("eyJ0eXAiOiJKV1QiLCJraWQiOiJkZjhlMjRjOC0xODk0LTRmODgtYjBhNS0yMDc4ODIzMDU4YzciLCJhbGciOiJFUzI1NiIsImlzcyI6Imh0dHBzOi8vY29nbml0by1pZHAuYXAtbm9ydGhlYXN0LTEuYW1hem9uYXdzLmNvbS9hcC1ub3J0aGVhc3QtMV9lS0NkeVRFZ1YiLCJjbGllbnQiOiI0aHZqdmpvYWQ1aXQyMzVndGZuMnFwNXFjZSIsInNpZ25lciI6ImFybjphd3M6ZWxhc3RpY2xvYWRiYWxhbmNpbmc6YXAtbm9ydGhlYXN0LTE6ODU4ODg0MTk4MDQ0OmxvYWRiYWxhbmNlci9hcHAvc2ltcGxlLWNvbW11bml0eS1kZXZlbG9wLWNvbW1vbi83MWMzZTljOTNjMjcyMjFkIiwiZXhwIjoxNjMzMTkyOTk5fQ==.eyJzdWIiOiIzZDZmYTkzZS04YzYxLTQ2ZDAtYjlhZC1hNDgxNzY4YzYxMzEiLCJlbWFpbF92ZXJpZmllZCI6InRydWUiLCJlbWFpbCI6Inlvc2hpbm9yaS5zYXRvaC50b2t5b0BnbWFpbC5jb20iLCJ1c2VybmFtZSI6Inlvc2hpbm9yaSIsImV4cCI6MTYzMzE5Mjk5OSwiaXNzIjoiaHR0cHM6Ly9jb2duaXRvLWlkcC5hcC1ub3J0aGVhc3QtMS5hbWF6b25hd3MuY29tL2FwLW5vcnRoZWFzdC0xX2VLQ2R5VEVnViJ9.eS86Jmql7pfoJxOYSkzT7OSkC677vi6-PptGtUeiQZzXq9Hmv7RA2n53EPIR7uRto1N97JvZl_6vuJpJeNbE4A==", func(tk *jwt.Token) (interface{}, error) {
+			token, err := jwt.Parse(h.Data, func(tk *jwt.Token) (interface{}, error) {
 				fmt.Println(tk)
 				fmt.Println("aaaaaaaaaaaaaa")
-				if _, ok := tk.Method.(*jwt.SigningMethodRSA); !ok {
+				if _, ok := tk.Method.(*jwt.SigningMethodECDSA); !ok {
 					fmt.Println("ccccccccccccccccc")
 					log.Printf("Unexpected signing method: %v", tk.Header["alg"])
 					c.Status(http.StatusUnauthorized)
