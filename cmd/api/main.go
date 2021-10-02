@@ -4,23 +4,29 @@ import (
 	"log"
 
 	"github.com/yoshinori-development/simple-community-api-main/config"
+	"github.com/yoshinori-development/simple-community-api-main/i18n"
 	"github.com/yoshinori-development/simple-community-api-main/repositories"
 	"github.com/yoshinori-development/simple-community-api-main/router"
 )
 
-// _ "github.com/go-sql-driver/mysql"
-
 func main() {
-	err := config.Init()
+	var err error
+
+	err = config.Init()
 	if err != nil {
 		log.Fatal(err.Error())
 	}
 
-	err = repositories.InitDbCore()
+	err = repositories.InitDbMain()
 	if err != nil {
 		log.Fatal(err.Error())
 	}
 	defer repositories.Close()
+
+	err = i18n.Init()
+	if err != nil {
+		log.Fatal(err.Error())
+	}
 
 	r, err := router.Init()
 	if err != nil {

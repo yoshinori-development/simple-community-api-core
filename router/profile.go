@@ -32,18 +32,15 @@ type ProfileResponse struct {
 }
 
 func (controller *ProfileHandler) Get(c *gin.Context) {
-	sub, subExists := c.Get("sub")
-	if subExists {
-		c.Status(http.StatusUnauthorized)
-	}
+	sub, _ := c.Get("sub")
 	profile, err := controller.ProfileService.Get(services.ProfileServiceGetInput{
 		Sub: sub.(string),
 	})
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			c.JSON(http.StatusBadRequest, RenderMessageError(err, "プロフィールが登録されていません"))
 		} else {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			c.JSON(http.StatusInternalServerError, RenderMessageError(err, "エラーが発生しました"))
 		}
 		return
 	}
@@ -64,15 +61,11 @@ type ProfileHandlerCreateOrUpdateInput struct {
 func (controller *ProfileHandler) CreateOrUpdate(c *gin.Context) {
 	var input ProfileHandlerCreateOrUpdateInput
 	if err := c.BindJSON(&input); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"errors": formatValidationErrors(err)})
+		c.JSON(http.StatusUnprocessableEntity, RenderValidationError(err))
 		return
 	}
 
-	sub, subExists := c.Get("sub")
-	if !subExists {
-		c.Status(http.StatusUnauthorized)
-		return
-	}
+	sub, _ := c.Get("sub")
 	err := controller.ProfileService.CreateOrUpdate(services.ProfileServiceCreateOrUpdateInput{
 		Profile: models.Profile{
 			Sub:      sub.(string),
@@ -81,7 +74,7 @@ func (controller *ProfileHandler) CreateOrUpdate(c *gin.Context) {
 		},
 	})
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, RenderMessageError(err, "エラーが発生しました"))
 	}
 
 	c.Status(http.StatusOK)

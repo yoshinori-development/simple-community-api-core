@@ -1,23 +1,19 @@
 package router
 
 import (
-	"fmt"
 	"net/http"
 	"reflect"
 	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
-	"github.com/go-playground/locales/ja"
-	ut "github.com/go-playground/universal-translator"
 	"github.com/go-playground/validator/v10"
 	ja_translations "github.com/go-playground/validator/v10/translations/ja"
 	"github.com/yoshinori-development/simple-community-api-main/config"
+	"github.com/yoshinori-development/simple-community-api-main/i18n"
 	"github.com/yoshinori-development/simple-community-api-main/repositories"
 	"github.com/yoshinori-development/simple-community-api-main/services"
 )
-
-var trans ut.Translator
 
 func Init() (*gin.Engine, error) {
 	config := config.Get()
@@ -28,10 +24,8 @@ func Init() (*gin.Engine, error) {
 	setupCors(r, routerConf)
 	setupAuthenticate(r, awsConf)
 
-	uni := ut.New(ja.New())
-	trans, _ = uni.GetTranslator("ja")
 	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
-		_ = ja_translations.RegisterDefaultTranslations(v, trans)
+		_ = ja_translations.RegisterDefaultTranslations(v, i18n.Translator)
 		v.RegisterTagNameFunc(func(fld reflect.StructField) string {
 			name := strings.SplitN(fld.Tag.Get("form"), ",", 2)[0]
 			if name == "-" {
@@ -63,20 +57,12 @@ func Init() (*gin.Engine, error) {
 	profileHandler := NewProfileHandler(NewProfileHandlerInput{
 		ProfileService: profileService,
 	})
-	r.GET("/profile", profileHandler.Get)
-	r.PUT("/profile", profileHandler.CreateOrUpdate)
+	profile := r.Group("/profile")
+	profile.Use(mustAuthenticated())
+	{
+		profile.GET("", profileHandler.Get)
+		profile.PUT("", profileHandler.CreateOrUpdate)
+	}
 
 	return r, nil
-}
-
-type validationError map[string]string
-
-func formatValidationErrors(err error) validationError {
-	errs := err.(validator.ValidationErrors)
-	formattedErrs := make(validationError, len(errs))
-	for _, err := range errs {
-		formattedErrs[err.Field()] = err.Translate(trans)
-	}
-	fmt.Println(formattedErrs)
-	return formattedErrs
 }

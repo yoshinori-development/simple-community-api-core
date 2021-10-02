@@ -1,6 +1,8 @@
 package services
 
 import (
+	"fmt"
+
 	"github.com/yoshinori-development/simple-community-api-main/models"
 )
 
@@ -50,7 +52,7 @@ func (services *profileService) CreateOrUpdate(input ProfileServiceCreateOrUpdat
 		},
 	})
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to CreateOrUpdate profile: %w", err)
 	}
 	return nil
 }

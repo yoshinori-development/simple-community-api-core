@@ -1,6 +1,7 @@
 package router
 
 import (
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -42,7 +43,6 @@ func authenticate(awsConf config.Aws) gin.HandlerFunc {
 			log.Print(err)
 		}
 
-		c.Set("sub", "test-sub-3")
 		if h.Data != "" {
 			token, err := jwt.Parse(h.Data, func(token *jwt.Token) (interface{}, error) {
 				if _, ok := token.Method.(*jwt.SigningMethodRSA); !ok {
@@ -65,6 +65,16 @@ func authenticate(awsConf config.Aws) gin.HandlerFunc {
 			}
 		}
 
+		c.Next()
+	}
+}
+
+func mustAuthenticated() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		if _, exists := c.Get("sub"); !exists {
+			c.JSON(http.StatusUnauthorized, RenderMessageError(errors.New("not authenticated"), "ログインが必要です"))
+			c.Abort()
+		}
 		c.Next()
 	}
 }

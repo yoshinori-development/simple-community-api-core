@@ -36,19 +36,19 @@ func Init() error {
 	var err error
 
 	err = envconfig.Process("aws", &config.Aws)
-	fmt.Printf("aws config: %v", config.Aws)
+	fmt.Printf("aws config: %v\n", config.Aws)
 	if err != nil {
 		return err
 	}
 
 	err = envconfig.Process("database", &config.Database)
-	fmt.Printf("database config: %v", config.Database)
+	fmt.Printf("database config: %v\n", config.Database)
 	if err != nil {
 		return err
 	}
 
 	err = envconfig.Process("router", &config.Router)
-	fmt.Printf("router config: %v", config.Router)
+	fmt.Printf("router config: %v\n", config.Router)
 	if err != nil {
 		return err
 	}

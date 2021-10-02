@@ -1,9 +1,10 @@
 package repositories
 
 import (
-	"errors"
 	"fmt"
 	"time"
+
+	"errors"
 
 	"github.com/yoshinori-development/simple-community-api-main/models"
 	"gorm.io/gorm"
@@ -41,21 +42,26 @@ func (repositories *ProfileRepository) CreateOrUpdate(input models.ProfileReposi
 	var profile models.Profile
 
 	result := db.Where("sub = ?", input.Profile.Sub).First(&profile)
-	fmt.Print(result.Error)
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-		db.Create(&Profile{
+		createResult := db.Create(&Profile{
 			Sub:      input.Profile.Sub,
 			Nickname: input.Profile.Nickname,
 			Age:      input.Profile.Age,
 		})
+		if createResult.Error != nil {
+			return fmt.Errorf("failed to create profile: %w", result.Error)
+		}
 	} else if result.Error == nil {
-		db.Where("sub = ?", input.Profile.Sub).Updates(&Profile{
+		updateResult := db.Where("sub = ?", input.Profile.Sub).Updates(&Profile{
 			Sub:      input.Profile.Sub,
 			Nickname: input.Profile.Nickname,
 			Age:      input.Profile.Age,
 		})
+		if updateResult.Error == nil {
+			return fmt.Errorf("failed to update profile: %w", result.Error)
+		}
 	} else {
-		return result.Error
+		return fmt.Errorf("failed to get profile: %w", result.Error)
 	}
 
 	return nil

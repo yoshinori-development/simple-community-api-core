@@ -33,7 +33,7 @@ type AnnouncementListResponse []AnnouncementResponse
 func (controller *AnnouncementHandler) List(c *gin.Context) {
 	announcements, err := controller.AnnouncementService.List()
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, RenderMessageError(err, "エラーが発生しました"))
 	}
 
 	var response AnnouncementListResponse

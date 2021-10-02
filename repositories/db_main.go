@@ -12,7 +12,7 @@ import (
 
 var db *gorm.DB
 
-func InitDbCore() error {
+func InitDbMain() error {
 	config := config.Get()
 	err := open(config)
 	if err != nil {

@@ -29,7 +29,7 @@ func main() {
 		log.Fatal(err.Error())
 	}
 
-	err = repositories.InitDbCore()
+	err = repositories.InitDbMain()
 	if err != nil {
 		log.Fatal(err.Error())
 	}
