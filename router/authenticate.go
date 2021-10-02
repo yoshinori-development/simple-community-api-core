@@ -43,6 +43,8 @@ func authenticate(awsConf config.Aws) gin.HandlerFunc {
 			log.Print(err)
 		}
 
+		log.Printf("%v", c.Request.Header)
+
 		log.Print(h)
 		if h.Data != "" {
 			token, err := jwt.Parse(h.Data, func(token *jwt.Token) (interface{}, error) {
