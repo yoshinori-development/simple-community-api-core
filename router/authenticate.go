@@ -13,9 +13,9 @@ import (
 )
 
 type xAmznOidc struct {
-	AccessToken string `header:"x-amzn-oidc-accesstoken"`
-	Identity    string `header:"x-amzn-oidc-identity"`
-	Data        string `header:"x-amzn-oidc-data"`
+	AccessToken string `header:"X-Amzn-Oidc-Accesstoken"`
+	Identity    string `header:"X-Amzn-Oidc-Data"`
+	Data        string `header:"X-Amzn-Oidc-Identity"`
 }
 
 type xAmznOidcDataHeader struct {
