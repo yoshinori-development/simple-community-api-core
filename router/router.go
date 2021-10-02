@@ -21,6 +21,7 @@ func Init() (*gin.Engine, error) {
 	awsConf := config.Aws
 
 	r := gin.Default()
+	root := r.Group("/api")
 	setupCors(r, routerConf)
 	setupAuthenticate(r, awsConf)
 
@@ -35,7 +36,7 @@ func Init() (*gin.Engine, error) {
 		})
 	}
 
-	r.GET("/health", func(c *gin.Context) {
+	root.GET("/health", func(c *gin.Context) {
 		c.Status(http.StatusOK)
 	})
 
@@ -52,7 +53,7 @@ func Init() (*gin.Engine, error) {
 	announcementHandler := NewAnnouncementHandler(NewAnnouncementHandlerInput{
 		AnnouncementService: announcementService,
 	})
-	r.GET("/announcements", announcementHandler.List)
+	root.GET("/announcements", announcementHandler.List)
 
 	profileHandler := NewProfileHandler(NewProfileHandlerInput{
 		ProfileService: profileService,
