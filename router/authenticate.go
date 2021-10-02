@@ -48,16 +48,16 @@ func authenticate(awsConf config.Aws) gin.HandlerFunc {
 		log.Print(h)
 		if h.Data != "" {
 			fmt.Println(h.Data)
-			token, err := jwt.Parse(h.Data, func(token *jwt.Token) (interface{}, error) {
-				fmt.Println(token)
+			token, err := jwt.Parse(h.Data, func(tokenString *jwt.Token) (interface{}, error) {
+				fmt.Println(tokenString)
 				fmt.Println("aaaaaaaaaaaaaa")
-				if _, ok := token.Method.(*jwt.SigningMethodRSA); !ok {
+				if _, ok := tokenString.Method.(*jwt.SigningMethodRSA); !ok {
 					fmt.Println("ccccccccccccccccc")
-					log.Printf("Unexpected signing method: %v", token.Header["alg"])
+					log.Printf("Unexpected signing method: %v", tokenString.Header["alg"])
 					c.Status(http.StatusUnauthorized)
 				}
 				fmt.Println("bbbbbbbbbbb")
-				url := fmt.Sprintf("https://public-keys.auth.elb.%s.amazonaws.com/%s", awsConf.DefaultRegion, token.Header["kid"])
+				url := fmt.Sprintf("https://public-keys.auth.elb.%s.amazonaws.com/%s", awsConf.DefaultRegion, tokenString.Header["kid"])
 				fmt.Println(url)
 				publicKey, err := ioutil.ReadFile(url)
 				fmt.Println(publicKey)
@@ -71,6 +71,7 @@ func authenticate(awsConf config.Aws) gin.HandlerFunc {
 
 			if err != nil {
 				fmt.Println(err)
+				return
 			}
 
 			fmt.Println("222222222222")
