@@ -49,7 +49,7 @@ func authenticate(awsConf config.Aws) gin.HandlerFunc {
 		log.Print(h)
 		if h.Data != "" {
 			fmt.Println(h.Data)
-			tokenString := strings.Replace(h.Data, "=", "", 2)
+			tokenString := strings.Replace(h.Data, "=", "", -1)
 			token, err := jwt.Parse(tokenString, func(tk *jwt.Token) (interface{}, error) {
 				fmt.Println(tk)
 				fmt.Println("aaaaaaaaaaaaaa")
@@ -73,8 +73,11 @@ func authenticate(awsConf config.Aws) gin.HandlerFunc {
 					c.Status(http.StatusUnauthorized)
 				}
 				fmt.Println(body)
-				fmt.Printf("%s", body)
-				publicKey, err := jwt.ParseECPublicKeyFromPEM(body)
+				pub := strings.Replace(fmt.Sprintf("%s", body), "=", "", -1)
+				fmt.Println(pub)
+				pubBytes := []byte(pub)
+				fmt.Println(pubBytes)
+				publicKey, err := jwt.ParseECPublicKeyFromPEM(pubBytes)
 				if err != nil {
 					fmt.Println("eeeeeeeeeeeeeee")
 					fmt.Print(err)
