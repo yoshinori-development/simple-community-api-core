@@ -73,6 +73,7 @@ func authenticate(awsConf config.Aws) gin.HandlerFunc {
 					c.Status(http.StatusUnauthorized)
 				}
 				fmt.Println(body)
+				fmt.Printf("%s", body)
 				publicKey, err := jwt.ParseECPublicKeyFromPEM(body)
 				if err != nil {
 					fmt.Println("eeeeeeeeeeeeeee")
