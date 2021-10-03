@@ -53,9 +53,9 @@ func authenticate(awsConf config.Aws) gin.HandlerFunc {
 			token, err := jwt.Parse(tokenString, func(tk *jwt.Token) (interface{}, error) {
 				fmt.Println(tk)
 				fmt.Println("aaaaaaaaaaaaaa")
-				if _, ok := tk.Method.(*jwt.SigningMethodRSA); !ok {
+				if _, ok := tk.Method.(*jwt.SigningMethodECDSA); !ok {
 					fmt.Println("ccccccccccccccccc")
-					log.Printf("Unexpected signing method: %v", tk.Header["alg"])
+					fmt.Printf("Unexpected signing method: %v", tk.Header["alg"])
 					c.Status(http.StatusUnauthorized)
 				}
 				fmt.Println("bbbbbbbbbbb")
@@ -69,13 +69,13 @@ func authenticate(awsConf config.Aws) gin.HandlerFunc {
 				body, err := ioutil.ReadAll(resp.Body)
 				if err != nil {
 					fmt.Println("ddddddddddddddddd")
-					log.Print(err)
+					fmt.Print(err)
 					c.Status(http.StatusUnauthorized)
 				}
 				publicKey, err := jwt.ParseECPublicKeyFromPEM(body)
 				if err != nil {
 					fmt.Println("eeeeeeeeeeeeeee")
-					log.Print(err)
+					fmt.Print(err)
 				}
 				fmt.Println("public key")
 				fmt.Println(publicKey)
