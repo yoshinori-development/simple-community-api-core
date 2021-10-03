@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
@@ -48,8 +49,7 @@ func authenticate(awsConf config.Aws) gin.HandlerFunc {
 		log.Print(h)
 		if h.Data != "" {
 			fmt.Println(h.Data)
-			// tokenString := strings.Replace(h.Data, "=", "", -1)
-			tokenString := h.Data
+			tokenString := strings.Replace(h.Data, "=", "", -1)
 			token, err := jwt.Parse(tokenString, func(tk *jwt.Token) (interface{}, error) {
 				fmt.Println(tk)
 				fmt.Println("aaaaaaaaaaaaaa")
