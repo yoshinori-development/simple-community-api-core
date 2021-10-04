@@ -50,9 +50,7 @@ func authenticate(awsConf config.Aws) gin.HandlerFunc {
 		if h.Data != "" {
 			fmt.Println(h.Data)
 
-			parts := strings.Split(h.Data, ".")
-			parts[0] = strings.Replace(parts[0], "=", "", -1)
-			tokenString := strings.Join(parts[0:2], ".")
+			tokenString := strings.Replace(h.Data, "=", "", -1)
 			token, err := jwt.Parse(tokenString, func(tk *jwt.Token) (interface{}, error) {
 				fmt.Println(tk)
 				fmt.Println("aaaaaaaaaaaaaa")
