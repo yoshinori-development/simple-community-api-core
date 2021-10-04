@@ -77,7 +77,7 @@ func authenticate(awsConf config.Aws) gin.HandlerFunc {
 				fmt.Println(pub)
 				pubBytes := []byte(pub)
 				fmt.Println(pubBytes)
-				publicKey, err := jwt.ParseECPublicKeyFromPEM(pubBytes)
+				publicKey, err := jwt.ParseECPublicKeyFromPEM(body)
 				if err != nil {
 					fmt.Println("eeeeeeeeeeeeeee")
 					fmt.Print(err)
