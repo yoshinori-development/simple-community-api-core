@@ -12,54 +12,6 @@ import (
 func main() {
 	var err error
 
-	// res, err := base64.RawURLEncoding.DecodeString("eyJzdWIiOiIzZDZmYTkzZS04YzYxLTQ2ZDAtYjlhZC1hNDgxNzY4YzYxMzEiLCJlbWFpbF92ZXJpZmllZCI6InRydWUiLCJlbWFpbCI6Inlvc2hpbm9yaS5zYXRvaC50b2t5b0BnbWFpbC5jb20iLCJ1c2VybmFtZSI6Inlvc2hpbm9yaSIsImV4cCI6MTYzMzI2NzU4MiwiaXNzIjoiaHR0cHM6Ly9jb2duaXRvLWlkcC5hcC1ub3J0aGVhc3QtMS5hbWF6b25hd3MuY29tL2FwLW5vcnRoZWFzdC0xX2VLQ2R5VEVnViJ9")
-	// fmt.Println(res)
-	// if err != nil {
-	// 	fmt.Println("qqqqqqqqqqqqqqqqqqqq")
-	// 	log.Println(err)
-	// }
-
-	// tokenStringRaw := "eyJ0eXAiOiJKV1QiLCJraWQiOiI4ODc3MDE3OC03MmRiLTRjNTAtOTQzMi1hNjllNTY3YTRkZWQiLCJhbGciOiJFUzI1NiIsImlzcyI6Imh0dHBzOi8vY29nbml0by1pZHAuYXAtbm9ydGhlYXN0LTEuYW1hem9uYXdzLmNvbS9hcC1ub3J0aGVhc3QtMV9lS0NkeVRFZ1YiLCJjbGllbnQiOiI0aHZqdmpvYWQ1aXQyMzVndGZuMnFwNXFjZSIsInNpZ25lciI6ImFybjphd3M6ZWxhc3RpY2xvYWRiYWxhbmNpbmc6YXAtbm9ydGhlYXN0LTE6ODU4ODg0MTk4MDQ0OmxvYWRiYWxhbmNlci9hcHAvc2ltcGxlLWNvbW11bml0eS1kZXZlbG9wLWNvbW1vbi83MWMzZTljOTNjMjcyMjFkIiwiZXhwIjoxNjMzMjY3NTgyfQ==.eyJzdWIiOiIzZDZmYTkzZS04YzYxLTQ2ZDAtYjlhZC1hNDgxNzY4YzYxMzEiLCJlbWFpbF92ZXJpZmllZCI6InRydWUiLCJlbWFpbCI6Inlvc2hpbm9yaS5zYXRvaC50b2t5b0BnbWFpbC5jb20iLCJ1c2VybmFtZSI6Inlvc2hpbm9yaSIsImV4cCI6MTYzMzI2NzU4MiwiaXNzIjoiaHR0cHM6Ly9jb2duaXRvLWlkcC5hcC1ub3J0aGVhc3QtMS5hbWF6b25hd3MuY29tL2FwLW5vcnRoZWFzdC0xX2VLQ2R5VEVnViJ9.yST7bBiTb0KW5rtQR991J6M4LjrJ6qj4QvevdBa5MQRwjvY-ugXxgVjapsbZ4Pu1NthINR9FsHT5dSkbBfkbfw=="
-	// // tokenString := strings.Replace(tokenStringRaw, "=", "", -1)
-	// tokenString := tokenStringRaw
-	// parts := strings.Split(tokenString, ".")
-	// if len(parts) != 3 {
-	// 	fmt.Println("fffffffffffffffff")
-	// }
-	// fmt.Println(parts)
-	// fmt.Println(parts[0])
-	// parts[0] = "eyJ0eXAiOiJKV1QiLCJraWQiOiI4ODc3MDE3OC03MmRiLTRjNTAtOTQzMi1hNjllNTY3YTRkZWQiLCJhbGciOiJFUzI1NiIsImlzcyI6Imh0dHBzOi8vY29nbml0by1pZHAuYXAtbm9ydGhlYXN0LTEuYW1hem9uYXdzLmNvbS9hcC1ub3J0aGVhc3QtMV9lS0NkeVRFZ1YiLCJjbGllbnQiOiI0aHZqdmpvYWQ1aXQyMzVndGZuMnFwNXFjZSIsInNpZ25lciI6ImFybjphd3M6ZWxhc3RpY2xvYWRiYWxhbmNpbmc6YXAtbm9ydGhlYXN0LTE6ODU4ODg0MTk4MDQ0OmxvYWRiYWxhbmNlci9hcHAvc2ltcGxlLWNvbW11bml0eS1kZXZlbG9wLWNvbW1vbi83MWMzZTljOTNjMjcyMjFkIiwiZXhwIjoxNjMzMjY3NTgyfQ=="
-	// dec, err := base64.RawURLEncoding.DecodeString("eyJ0eXAiOiJKV1QiLCJraWQiOiI4ODc3MDE3OC03MmRiLTRjNTAtOTQzMi1hNjllNTY3YTRkZWQiLCJhbGciOiJFUzI1NiIsImlzcyI6Imh0dHBzOi8vY29nbml0by1pZHAuYXAtbm9ydGhlYXN0LTEuYW1hem9uYXdzLmNvbS9hcC1ub3J0aGVhc3QtMV9lS0NkeVRFZ1YiLCJjbGllbnQiOiI0aHZqdmpvYWQ1aXQyMzVndGZuMnFwNXFjZSIsInNpZ25lciI6ImFybjphd3M6ZWxhc3RpY2xvYWRiYWxhbmNpbmc6YXAtbm9ydGhlYXN0LTE6ODU4ODg0MTk4MDQ0OmxvYWRiYWxhbmNlci9hcHAvc2ltcGxlLWNvbW11bml0eS1kZXZlbG9wLWNvbW1vbi83MWMzZTljOTNjMjcyMjFkIiwiZXhwIjoxNjMzMjY3NTgyfQ==")
-	// if err != nil {
-	// 	fmt.Println("bbbmmmmmmmmmmmmmm")
-	// 	fmt.Println(err)
-	// }
-	// fmt.Println(dec)
-
-	// token, err := jwt.Parse(tokenString, func(tk *jwt.Token) (interface{}, error) {
-	// 	fmt.Println("bbbbbbbbbbb")
-	// 	url := fmt.Sprintf("https://public-keys.auth.elb.%s.amazonaws.com/%s", "ap-northeast-1", "df8e24c8-1894-4f88-b0a5-2078823058c7")
-	// 	fmt.Println(url)
-	// 	resp, err := http.Get(url)
-	// 	if err != nil {
-	// 		log.Print(err)
-	// 	}
-	// 	defer resp.Body.Close()
-	// 	body, err := ioutil.ReadAll(resp.Body)
-	// 	fmt.Println(body)
-	// 	if err != nil {
-	// 		fmt.Println("ddddddddddddddddd")
-	// 		log.Print(err)
-	// 	}
-	// 	return jwt.ParseECPublicKeyFromPEM(body)
-	// })
-
-	// fmt.Println("token")
-	// fmt.Println(token)
-	// if err != nil {
-	// 	log.Println(err)
-	// }
-
 	err = config.Init()
 	if err != nil {
 		log.Fatal(err.Error())
